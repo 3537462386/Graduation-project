@@ -1,0 +1,29 @@
+{
+    "student": [
+        {
+            "student_id": 2020213000,
+            "class": 2021802,
+            "department": "软件学院",
+            "major": "软件工程",
+            "gender": "男",
+            "age": 20,
+            "name": "张三",
+            "phone_number": 13812345678,
+            "photo": "data:image/png;base64,iVBORw0KG...",
+            "grade": "大一"
+        },
+        {
+            "student_id": 2020213010,
+            "class": 2021802,
+            "department": "软件学院",
+            "major": "软件工程",
+            "gender": "男",
+            "age": 19,
+            "name": "李四",
+            "phone_number": 13812345578,
+            "photo": "data:image/png;base64,iVBORw0KG...",
+            "grade": "大二"
+        }
+    ]
+  }
+  

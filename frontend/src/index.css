@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+:root {
+  --defaultChat-width: 920px;
+  --defaultChat-height: 320px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+.flexCenter {
+  @apply flex justify-center items-center;
+}
