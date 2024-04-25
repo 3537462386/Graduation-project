@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-03-28 15:02:08
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-25 15:09:53
+ * @LastEditTime: 2024-04-25 17:17:14
  * @Description: Description
  */
 import { useState } from 'react';
@@ -63,7 +63,7 @@ export const Login = () => {
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (
     errorInfo
   ) => {
-    console.log('Failed:', errorInfo);
+    console.log('Failed11:', errorInfo);
   };
   return (
     <div className="w-full h-full overflow-hidden relative bg-[url('/static/login/bg1.jpg')] bg-cover bg-no-repeat">
