@@ -3,18 +3,26 @@
  * @Author: L·W
  * @Date: 2024-03-28 15:02:08
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-25 17:17:14
+ * @LastEditTime: 2024-04-26 13:36:28
  * @Description: Description
  */
 import { useState } from 'react';
-import { Avatar, Button, Checkbox, Form, Input, type FormProps } from 'antd';
-import { userLogin, userRegister, userGetAvatar } from '@/api/login';
+import {
+  Avatar,
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  type FormProps,
+  message
+} from 'antd';
+import { userLogin, userRegister, userGetAvatar } from '@/api';
 import { UserOutlined } from '@ant-design/icons';
 import useHook from '@/hooks/useHook';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '@/store/modules/common';
 type FieldType = {
-  username?: number;
+  username?: string;
   password?: string;
   remember?: string;
   name?: string;
@@ -27,34 +35,37 @@ export const Login = () => {
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     if (isLogin) {
       const res = await userLogin({
-        username: Number(values.username),
+        username: values.username,
         password: values.password
       });
-      if (res) {
+      if (res.code === 1) {
         dispatch(
           setUserInfo({
-            username: res.data.username,
-            name: res.data.name,
-            avatar: res.data.avatar
+            username: res.data?.username,
+            name: res.data?.name,
+            avatar: res.data?.avatar,
+            userId: res.data?._id
           })
         );
+        message.success('登录成功');
         routerPush('/home/msg');
       }
     } else {
       const res = await userRegister({
-        username: Number(values.username),
+        username: values.username,
         password: values.password,
         name: values.name
       });
-      if (res) {
-        console.log('注册成功');
+      if (res.code === 1) {
+        message.success('注册成功');
+        setIsLogin(!isLogin);
       }
     }
   };
 
   const getAvatar = async (e: any) => {
     if (e.target.value.length == 6) {
-      const res = await userGetAvatar({ username: Number(e.target.value) });
+      const res = await userGetAvatar({ username: e.target.value });
       // console.log(res);
       setAvatar(res.data.avatar);
     } else return;

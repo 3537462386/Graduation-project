@@ -24,7 +24,7 @@ const MsgListItem = (props: MsgListItemPropsType) => {
   const { isFocus, avatar } = props;
   return (
     <div
-      className={`w-full h-20 box-border p-2 flex items-center justify-between ${isFocus ? 'bg-[#e9e9e9]' : ''}`}
+      className={`w-full h-20 box-border p-2 flex items-center justify-between hover:bg-[#e9e9e9] ${isFocus ? 'bg-[#e9e9e9]' : ''}`}
     >
       <Avatar src={avatar} size={58} />
       <div className="flex-1 h-full mx-2 flex flex-col justify-around items-start">
@@ -43,7 +43,7 @@ export const Msg = () => {
     <div className="h-full flex-1">
       <HeaderBox />
       <div className="flex-1 w-full flex">
-        <div className="w-80 h-full overflow-hidden">
+        <div className="w-70 h-full overflow-hidden">
           <MsgListItem isFocus={false} avatar={''} />
         </div>
         <div className="h-full flex-1">

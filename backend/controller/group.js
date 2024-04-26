@@ -1,10 +1,10 @@
-const Stu_col = require('../model/student')
+const Group_col = require('../model/group')
 const config = require('../config/config')
 
 // 获取所有学生信息
 const getAll = async (ctx, next) => {
   // console.log('info',ctx.request.body);
-  const user_data = await Stu_col.find()
+  const user_data = await Group_col.find()
   // console.log(user_stu,'info');
   if (user_data) {
     ctx.body = {
@@ -17,7 +17,7 @@ const getAll = async (ctx, next) => {
 // 按学号搜索个人信息
 const getbystudentid = async (ctx, next) => {
   const { student_id } = ctx.request.body;
-  const user_data = await Stu_col.findOne({ student_id: student_id })
+  const user_data = await Group_col.findOne({ student_id: student_id })
   if (user_data) {
     ctx.body = {
       code: 1,
@@ -48,12 +48,12 @@ const updatestudent = async (ctx, next) => {
     photo: account.photo,
     grade: account.grade
   }
-  const user_stu = await Stu_col.updateOne({
+  const user_stu = await Group_col.updateOne({
     _id: ctx.request.body._id
   }, { $set: updateAccount }).then(async (res) => {
     // console.log(res,'result');
     if (res.modifiedCount) {
-      const result = await Stu_col.findOne({ _id: ctx.request.body._id })
+      const result = await Group_col.findOne({ _id: ctx.request.body._id })
       // console.log(result, 'result');
       ctx.body = {
         code: 1,
@@ -79,7 +79,7 @@ const addstudent = async (ctx, next) => {
     photo: account.photo,
     grade: account.grade
   }
-  const result = await Stu_col.create(addAccount)
+  const result = await Group_col.create(addAccount)
   ctx.body = {
     code: 1,
     msg: '添加成功',
@@ -91,7 +91,7 @@ const addstudent = async (ctx, next) => {
 const deletestudent = async (ctx, next) => {
   try {
     const { _id } = ctx.request.body
-    const result = await Stu_col.deleteOne({ _id: _id })
+    const result = await Group_col.deleteOne({ _id: _id })
     if (result && result.deletedCount > 0) {
       ctx.body = {
         code: 1,
