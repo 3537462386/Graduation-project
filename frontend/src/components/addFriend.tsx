@@ -3,10 +3,10 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-26 17:30:25
+ * @LastEditTime: 2024-04-27 13:48:12
  * @Description: Description
  */
-import { addUser, getUser } from '@/api';
+import { addUser, getGroup, getUser } from '@/api';
 import { setAddFriendVisible } from '@/store/modules/common';
 import { CloseOutlined, SearchOutlined } from '@ant-design/icons';
 import { Avatar, Button, Input, Tabs, TabsProps, message } from 'antd';
@@ -54,7 +54,7 @@ export const AddFriend = () => {
     const userData = await getUser({
       searchName: value
     });
-    const groupData = await getUser({
+    const groupData = await getGroup({
       searchName: value
     });
     setUserListData(userData.data);

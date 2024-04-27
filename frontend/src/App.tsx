@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-03-18 13:38:07
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-26 15:24:36
+ * @LastEditTime: 2024-04-27 14:58:19
  * @Description: Description
  */
 import './App.css';
@@ -19,7 +19,7 @@ function App() {
   );
   return (
     <>
-      <div className="w-default-width h-default-height absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 border-dark-900 border-solid">
+      <div className="w-default-width h-default-height bg-white absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 border border-solid border-[#e9e9e9] shadow-lg">
         <RouterProvider router={router} />
       </div>
       {addFriendVisible && <AddFriend />}

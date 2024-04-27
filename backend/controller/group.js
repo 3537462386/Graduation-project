@@ -1,32 +1,32 @@
 const Group_col = require('../model/group')
 const config = require('../config/config')
 
-// 获取所有学生信息
-const getAll = async (ctx, next) => {
+// 获取所有群组
+const getAllGroup = async (ctx, next) => {
   // console.log('info',ctx.request.body);
-  const user_data = await Group_col.find()
+  const res = await Group_col.find()
   // console.log(user_stu,'info');
-  if (user_data) {
+  if (res) {
     ctx.body = {
       code: 1,
       msg: '查询成功',
-      data: user_data
+      data: res
     }
   }
 }
-// 按学号搜索个人信息
-const getbystudentid = async (ctx, next) => {
-  const { student_id } = ctx.request.body;
-  const user_data = await Group_col.findOne({ student_id: student_id })
-  if (user_data) {
+// 搜索群组
+const getGroup = async (ctx, next) => {
+  const { searchName } = ctx.request.body;
+  const result = await Group_col.find({ $or: [{ username: searchName }, { name: searchName }] })
+  if (result) {
     ctx.body = {
       code: 1,
       msg: '查询成功',
-      data: user_data
+      data: result
     }
   }else [
     ctx.body = {
-      code: 0,
+      code: -1,
       msg: '查无此人'
     }
   ]
@@ -118,9 +118,6 @@ const deletestudent = async (ctx, next) => {
 
 
 module.exports = {
-  getAll,
-  updatestudent,
-  addstudent,
-  deletestudent,
-  getbystudentid
+  getAllGroup,
+  getGroup
 }

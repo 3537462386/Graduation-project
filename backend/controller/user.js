@@ -2,12 +2,12 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-26 17:54:25
+ * @LastEditTime: 2024-04-27 13:40:45
  * @Description: Description
  */
 const User_col = require('../model/user')
 const config = require('../config/config')
-
+const Group_col = require('../model/group')
 // 登录操作
 const login = async (ctx, next) => {
 	// console.log('body:', ctx.request.body);
@@ -81,7 +81,7 @@ const register = async (ctx, next) => {
 		name: name
 		})
 		if (newUser) {
-			// console.log(newStu.userId,newStu.username);
+			const result = await Group_col.findByIdAndUpdate('662b733302bd84ce29d1756b', { $push: { users: newUser._id } })
 			ctx.body = {
 				code: 1,
 				msg: '注册成功',

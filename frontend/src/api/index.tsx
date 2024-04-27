@@ -28,6 +28,9 @@ export const userGetAvatar = async (data: any): Promise<resState> => {
 export const getUser = async (data: any): Promise<resState> => {
   return request.post('/user/getUser', data);
 };
+export const getGroup = async (data: any): Promise<resState> => {
+  return request.post('/group/getGroup', data);
+};
 export const addUser = async (data: any): Promise<resState> => {
   return request.post('/user/addUser', data);
 };
