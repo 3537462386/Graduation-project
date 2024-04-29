@@ -3,21 +3,19 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-27 14:54:12
+ * @LastEditTime: 2024-04-29 16:49:42
  * @Description: Description
  */
 import { getFriends } from '@/api';
 import { HeaderBox } from '@/components/headerBox';
-import { User } from '@/types';
+import { UserType, GroupType } from '@/types';
 import { Avatar, Badge, Button, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 interface MsgListItemPropsType {
-  name?: string;
-  avatar?: string;
+  item?: UserType | GroupType;
   setNowFocus?: any;
-  username?: string;
-  nowFocus?: string;
+  nowFocus?: UserType | GroupType;
 }
 // interface MsgItemPropsType {
 //   avatar: string;
@@ -29,18 +27,18 @@ interface MsgListItemPropsType {
 //    )
 // }
 const MsgListItem = (props: MsgListItemPropsType) => {
-  const { avatar, name, setNowFocus, username, nowFocus } = props;
+  const { item, setNowFocus, nowFocus } = props;
   const changeAction = () => {
-    setNowFocus(username);
+    setNowFocus(item);
   };
   return (
     <div
-      className={`w-full h-20 box-border p-2 flex items-center justify-between ${nowFocus !== username ? 'hover:bg-[#e9e9e9]' : ''} ${nowFocus === username ? 'bg-[#0099ff]' : ''}`}
+      className={`w-full h-20 box-border p-2 flex items-center justify-between ${nowFocus?.username !== item?.username ? 'hover:bg-[#e9e9e9]' : ''} ${nowFocus?.username === item?.username ? 'bg-[#0099ff]' : ''}`}
       onClick={changeAction}
     >
-      <Avatar src={avatar} size={58} />
+      <Avatar src={item?.avatar} size={58} />
       <div className="flex-1 h-full mx-2 flex flex-col justify-around items-start">
-        <div>{name}</div>
+        <div>{item?.name}</div>
         <div>{'msg'}</div>
       </div>
       <div className="flex h-full flex-col justify-around">
@@ -52,8 +50,8 @@ const MsgListItem = (props: MsgListItemPropsType) => {
 };
 export const Msg = () => {
   // const [groupListData, setGroupListData] = useState([]);
-  const [nowFocus, setNowFocus] = useState();
-  const [friendListData, setFriendListData] = useState<User[]>([]);
+  const [nowFocus, setNowFocus] = useState<UserType | GroupType>();
+  const [friendListData, setFriendListData] = useState<UserType[]>([]);
   const userInfo = useSelector((state: any) => state.commonSlice.userInfo);
   const getFriendsList = async () => {
     const res = await getFriends({
@@ -72,30 +70,28 @@ export const Msg = () => {
     getFriendsList();
   }, []);
   return (
-    <div className="h-full flex-1">
-      <HeaderBox />
+    <div className="h-full flex-1 flex flex-col">
+      <HeaderBox name={nowFocus?.name} />
       <div className="flex-1 w-full flex">
         <div className="w-70 h-full overflow-hidden">
           {/* <MsgListItem isFocus={false} avatar={''} /> */}
           {friendListData?.map((item, index) => (
             <MsgListItem
               key={index}
-              avatar={item.avatar}
-              name={item.name}
-              username={item.username}
+              item={item}
               setNowFocus={setNowFocus}
               nowFocus={nowFocus}
             />
           ))}
         </div>
-        <div className="h-full flex-1">
-          <div></div>
-          <div className="w-full h-45 box-border p-4">
+        <div className="h-full flex-1 flex flex-col">
+          <div className="flex-1 bg-[#f2f2f2]">1</div>
+          <div className="w-full h-30 box-border p-2 bg-[#e9e9e9]">
             <div className="w-full">
               <div></div>
               <div></div>
             </div>
-            <Input variant="borderless" className="w-full h-24" />
+            <Input variant="borderless" className="w-full h-10" />
             <div className="w-full flex justify-end items-center">
               <Button type="primary" htmlType="submit">
                 发送

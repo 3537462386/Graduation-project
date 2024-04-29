@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-03-28 15:18:32
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-24 15:35:59
+ * @LastEditTime: 2024-04-29 16:48:46
  * @Description: Description
  */
 import type { Config } from 'tailwindcss';
@@ -63,7 +63,7 @@ const config: Config = {
         // 可以添加更多的宽度变量
       },
       height: {
-        'default-height': '420px'
+        'default-height': '500px'
         // 'screen-1/2': '50vh'
         // 可以添加更多的高度变量
       }
