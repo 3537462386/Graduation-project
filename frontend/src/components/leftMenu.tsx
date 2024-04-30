@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-26 14:44:20
+ * @LastEditTime: 2024-04-30 18:10:27
  * @Description: Description
  */
 // import { CommonState } from '@/store/modules/common';
@@ -42,7 +42,7 @@ const MenuItem = (props: PropsType) => {
   );
 };
 export const LeftMenu = () => {
-  const userInfo = useSelector((state: any) => state.commonSlice.userInfo);
+  const userInfo = useSelector((state: any) => state.userSlice);
   return (
     <div className="h-full w-15 py-5 flex flex-col justify-between box-border bg-[#f2f2f2]">
       <div className="w-full flex flex-col items-center justify-center">

@@ -37,3 +37,6 @@ export const addUser = async (data: any): Promise<resState> => {
 export const getFriends = async (data: any): Promise<resState> => {
   return request.post('/user/getFriends', data);
 };
+export const newMsg = async (data: any): Promise<resState> => {
+  return request.post('/msg/newMsg', data);
+};

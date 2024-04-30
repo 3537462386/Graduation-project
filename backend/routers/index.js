@@ -8,9 +8,8 @@
 const router = require('koa-router')();
 const user_controller=require('../controller/user')
 const group_controller=require('../controller/group')
-
+const msg_controller=require('../controller/message')
 /* user. */
-
 // 登录
 router.post('/user/login', user_controller.login)
 // 注册
@@ -21,23 +20,20 @@ router.post('/user/getAvatar', user_controller.getAvatar)
 router.post('/user/getUser', user_controller.getUser)
 // 查询好友
 router.post('/user/getFriends', user_controller.getFriends)
-// 添加用户
+// 发送好友申请
 router.post('/user/addUser', user_controller.addUser)
-/* user. */
-
+// 同意好友申请
+router.post('/user/agreeUser', user_controller.agreeUser)
+/* group. */
 // 获取所有群组
 router.post('/group/getAllGroup', group_controller.getAllGroup)
-
-// // 编辑并保存信息
-// router.post('/updatestudent', group_controller.updatestudent)
-
-// // 增加学生信息0
-// router.post('/addstudent', group_controller.addstudent)
-
-// // 删除学生信息
-// router.post('/deletestudent', group_controller.deletestudent)
-
-// 按学号搜索信息
+// 搜索群组
 router.post('/group/getGroup', group_controller.getGroup)
+
+/* msg. */
+// 新消息
+router.post('/msg/newMsg', msg_controller.newMsg)
+// 搜索群组
+// router.post('/msg/getGroup', group_controller.getGroup)
 
 module.exports = router

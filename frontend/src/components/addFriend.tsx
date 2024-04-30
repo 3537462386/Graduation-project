@@ -20,14 +20,14 @@ interface MsgListItemPropsType {
 }
 const MsgListItem = (props: MsgListItemPropsType) => {
   const { avatar, name, username, friendId } = props;
-  const userInfo = useSelector((state: any) => state.commonSlice.userInfo);
+  const userInfo = useSelector((state: any) => state.userSlice);
   const addFriend = async () => {
     const res = await addUser({
       userId: userInfo.userId,
       friendId: friendId
     });
     if (res.code === 1) {
-      message.success('添加成功');
+      message.success('发送成功');
     }
   };
   return (

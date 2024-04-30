@@ -3,15 +3,16 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-29 16:49:42
+ * @LastEditTime: 2024-04-30 18:26:35
  * @Description: Description
  */
-import { getFriends } from '@/api';
+import { getFriends, newMsg } from '@/api';
 import { HeaderBox } from '@/components/headerBox';
 import { UserType, GroupType } from '@/types';
 import { Avatar, Badge, Button, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import io from 'socket.io-client';
 interface MsgListItemPropsType {
   item?: UserType | GroupType;
   setNowFocus?: any;
@@ -49,10 +50,13 @@ const MsgListItem = (props: MsgListItemPropsType) => {
   );
 };
 export const Msg = () => {
+  const socket = io('http://localhost:4000');
   // const [groupListData, setGroupListData] = useState([]);
   const [nowFocus, setNowFocus] = useState<UserType | GroupType>();
   const [friendListData, setFriendListData] = useState<UserType[]>([]);
-  const userInfo = useSelector((state: any) => state.commonSlice.userInfo);
+  const userInfo = useSelector((state: any) => state.userSlice);
+  const [inputMsg, setInputMsg] = useState('');
+
   const getFriendsList = async () => {
     const res = await getFriends({
       username: userInfo.username
@@ -65,7 +69,36 @@ export const Msg = () => {
   //   });
   //   setFriendListData(res.data);
   // };
+  const sendMsg = async () => {
+    const trimmedMsg = inputMsg.trim(); // 去除首尾空格
+    const res = await newMsg({
+      to: userInfo.username,
+      from: nowFocus?.username,
+      Content: trimmedMsg
+    });
+    if (res.code === 1) {
+      socket.emit('message', {
+        to: userInfo.username,
+        from: nowFocus?.username,
+        Content: trimmedMsg
+      });
+    } else {
+      alert('发送失败');
+    }
+    setInputMsg('');
+  };
+
   useEffect(() => {
+    // 监听接收到消息事件
+    socket.on('message', (data) => {
+      console.log('收到消息：', data);
+    });
+  }, [socket]);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      socket.emit('newJoin', userInfo.username);
+    });
     // getAllChat();
     getFriendsList();
   }, []);
@@ -91,9 +124,20 @@ export const Msg = () => {
               <div></div>
               <div></div>
             </div>
-            <Input variant="borderless" className="w-full h-10" />
+            <Input
+              onChange={(e) => {
+                setInputMsg(e.target.value);
+              }}
+              variant="borderless"
+              value={inputMsg}
+              className="w-full h-10"
+            />
             <div className="w-full flex justify-end items-center">
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                onClick={sendMsg}
+                disabled={!inputMsg.trim()}
+              >
                 发送
               </Button>
             </div>

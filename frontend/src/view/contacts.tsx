@@ -36,7 +36,7 @@ export const Contacts = () => {
   // const [groupListData, setGroupListData] = useState([]);
   const [nowFocus, setNowFocus] = useState<UserType | GroupType>();
   const [friendListData, setFriendListData] = useState<UserType[]>([]);
-  const userInfo = useSelector((state: any) => state.commonSlice.userInfo);
+  const userInfo = useSelector((state: any) => state.userSlice);
   const getFriendsList = async () => {
     const res = await getFriends({
       username: userInfo.username

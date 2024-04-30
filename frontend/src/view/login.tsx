@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-03-28 15:02:08
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-26 13:36:28
+ * @LastEditTime: 2024-04-30 18:08:37
  * @Description: Description
  */
 import { useState } from 'react';
@@ -20,7 +20,7 @@ import { userLogin, userRegister, userGetAvatar } from '@/api';
 import { UserOutlined } from '@ant-design/icons';
 import useHook from '@/hooks/useHook';
 import { useDispatch } from 'react-redux';
-import { setUserInfo } from '@/store/modules/common';
+import { setUserInfo } from '@/store/modules/user';
 type FieldType = {
   username?: string;
   password?: string;

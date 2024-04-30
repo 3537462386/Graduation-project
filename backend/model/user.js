@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-26 16:21:52
+ * @LastEditTime: 2024-04-30 18:35:58
  * @Description: Description
  */
 // 用户表
@@ -37,7 +37,11 @@ const UserSchema = new Schema({
 	friends: [{
         type: Schema.Types.ObjectId,
         ref: 'user'
-    }]
+    }],
+	newFriends: [{
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+    }],
 }, {
 	collection: 'user',
 	versionKey: false

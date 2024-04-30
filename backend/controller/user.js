@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-27 13:40:45
+ * @LastEditTime: 2024-04-30 18:39:40
  * @Description: Description
  */
 const User_col = require('../model/user')
@@ -190,17 +190,41 @@ const getFriends = async (ctx, next) => {
 	}
 }
 
-// 添加用户
+// 发送好友申请
 const addUser = async (ctx, next) => {
 	const { userId,friendId } = ctx.request.body;
 	// 查表
 	try {
-		const result = await User_col.findByIdAndUpdate(userId, { $push: { friends: friendId } })
+		const result = await User_col.findByIdAndUpdate(friendId, { $push: { newFriends: userId } })
 		if (result) {
 			ctx.body = {
 				code: 1,
-				msg: '添加成功',
+				msg: '发送成功',
 				data: result
+			}
+			return;
+		}
+	} catch (err) {
+		ctx.body = {
+			code: -1,
+			msg: '用户名不存在'
+		}
+		return;
+	}
+}
+
+// 同意好友申请
+const agreeUser = async (ctx, next) => {
+	const { userId,friendId } = ctx.request.body;
+	// 查表
+	try {
+		const result1 = await User_col.findByIdAndUpdate(userId, { $pull: { newFriends: friendId } })
+		const result2 = await User_col.findByIdAndUpdate(userId, { $push: { friends: friendId } })
+		if (result2) {
+			ctx.body = {
+				code: 1,
+				msg: '添加成功',
+				data: result2
 			}
 			return;
 		}
@@ -219,5 +243,6 @@ module.exports = {
 	getAvatar,
 	getUser,
 	addUser,
+	agreeUser,
 	getFriends
 }
