@@ -11,6 +11,7 @@
 * {
   margin: 0;
   padding: 0;
+  @apply box-border;
 }
 .flexCenter {
   @apply flex justify-center items-center;

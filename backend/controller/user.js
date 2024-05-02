@@ -190,59 +190,10 @@ const getFriends = async (ctx, next) => {
 	}
 }
 
-// 发送好友申请
-const addUser = async (ctx, next) => {
-	const { userId,friendId } = ctx.request.body;
-	// 查表
-	try {
-		const result = await User_col.findByIdAndUpdate(friendId, { $push: { newFriends: userId } })
-		if (result) {
-			ctx.body = {
-				code: 1,
-				msg: '发送成功',
-				data: result
-			}
-			return;
-		}
-	} catch (err) {
-		ctx.body = {
-			code: -1,
-			msg: '用户名不存在'
-		}
-		return;
-	}
-}
-
-// 同意好友申请
-const agreeUser = async (ctx, next) => {
-	const { userId,friendId } = ctx.request.body;
-	// 查表
-	try {
-		const result1 = await User_col.findByIdAndUpdate(userId, { $pull: { newFriends: friendId } })
-		const result2 = await User_col.findByIdAndUpdate(userId, { $push: { friends: friendId } })
-		if (result2) {
-			ctx.body = {
-				code: 1,
-				msg: '添加成功',
-				data: result2
-			}
-			return;
-		}
-	} catch (err) {
-		ctx.body = {
-			code: -1,
-			msg: '用户名不存在'
-		}
-		return;
-	}
-}
-
 module.exports = {
 	login,
 	register,
 	getAvatar,
 	getUser,
-	addUser,
-	agreeUser,
 	getFriends
 }

@@ -3,10 +3,10 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-27 13:48:12
+ * @LastEditTime: 2024-05-02 14:48:47
  * @Description: Description
  */
-import { addUser, getGroup, getUser } from '@/api';
+import { sendReq, getGroup, getUser } from '@/api';
 import { setAddFriendVisible } from '@/store/modules/common';
 import { CloseOutlined, SearchOutlined } from '@ant-design/icons';
 import { Avatar, Button, Input, Tabs, TabsProps, message } from 'antd';
@@ -22,9 +22,9 @@ const MsgListItem = (props: MsgListItemPropsType) => {
   const { avatar, name, username, friendId } = props;
   const userInfo = useSelector((state: any) => state.userSlice);
   const addFriend = async () => {
-    const res = await addUser({
-      userId: userInfo.userId,
-      friendId: friendId
+    const res = await sendReq({
+      to: friendId,
+      from: userInfo.userId
     });
     if (res.code === 1) {
       message.success('发送成功');

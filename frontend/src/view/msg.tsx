@@ -3,12 +3,12 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-30 18:26:35
+ * @LastEditTime: 2024-05-02 17:55:28
  * @Description: Description
  */
-import { getFriends, newMsg } from '@/api';
+import { getFriends, newMsg, getMsg } from '@/api';
 import { HeaderBox } from '@/components/headerBox';
-import { UserType, GroupType } from '@/types';
+import { UserType, GroupType, MsgType } from '@/types';
 import { Avatar, Badge, Button, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ interface MsgListItemPropsType {
   item?: UserType | GroupType;
   setNowFocus?: any;
   nowFocus?: UserType | GroupType;
+  setMsgListData: any;
 }
 // interface MsgItemPropsType {
 //   avatar: string;
@@ -28,9 +29,15 @@ interface MsgListItemPropsType {
 //    )
 // }
 const MsgListItem = (props: MsgListItemPropsType) => {
-  const { item, setNowFocus, nowFocus } = props;
-  const changeAction = () => {
+  const { item, setNowFocus, nowFocus, setMsgListData } = props;
+  const userInfo = useSelector((state: any) => state.userSlice);
+  const changeAction = async () => {
     setNowFocus(item);
+    const res = await getMsg({
+      from: userInfo.userId,
+      to: item?._id
+    });
+    setMsgListData(res.data);
   };
   return (
     <div
@@ -54,6 +61,7 @@ export const Msg = () => {
   // const [groupListData, setGroupListData] = useState([]);
   const [nowFocus, setNowFocus] = useState<UserType | GroupType>();
   const [friendListData, setFriendListData] = useState<UserType[]>([]);
+  const [msgListData, setMsgListData] = useState<MsgType[]>([]);
   const userInfo = useSelector((state: any) => state.userSlice);
   const [inputMsg, setInputMsg] = useState('');
 
@@ -72,15 +80,20 @@ export const Msg = () => {
   const sendMsg = async () => {
     const trimmedMsg = inputMsg.trim(); // 去除首尾空格
     const res = await newMsg({
-      to: userInfo.username,
-      from: nowFocus?.username,
-      Content: trimmedMsg
+      from: userInfo.userId,
+      to: nowFocus?._id,
+      content: trimmedMsg
     });
+    await getMsg({
+      from: userInfo.userId,
+      to: nowFocus?._id
+    });
+    setMsgListData(res.data);
     if (res.code === 1) {
       socket.emit('message', {
-        to: userInfo.username,
-        from: nowFocus?.username,
-        Content: trimmedMsg
+        from: userInfo.userId,
+        to: nowFocus?._id,
+        content: trimmedMsg
       });
     } else {
       alert('发送失败');
@@ -113,12 +126,44 @@ export const Msg = () => {
               key={index}
               item={item}
               setNowFocus={setNowFocus}
+              setMsgListData={setMsgListData}
               nowFocus={nowFocus}
             />
           ))}
         </div>
         <div className="h-full flex-1 flex flex-col">
-          <div className="flex-1 bg-[#f2f2f2]">1</div>
+          <div className="h-[318px] w-full bg-[#f2f2f2] overflow-scroll overflow-x-hidden">
+            {msgListData?.map((item, index) => (
+              <>
+                {item?.from?.username === userInfo.username ? (
+                  ''
+                ) : (
+                  <div
+                    className="w-full h-15 my-2 flex items-center justify-start"
+                    key={index}
+                  >
+                    <Avatar src={item?.to?.avatar} size={45} />
+                    <div className="h-10 flexCenter px-4 rounded-md bg-white">
+                      {item?.content}
+                    </div>
+                  </div>
+                )}
+                {item?.from?.username === userInfo.username ? (
+                  <div
+                    className="w-full h-15 my-2 flex items-center justify-end"
+                    key={index}
+                  >
+                    <div className="h-10 flexCenter px-4 rounded-md bg-[#0099ff] text-white">
+                      {item?.content}
+                    </div>
+                    <Avatar src={item?.from?.avatar} size={45} />
+                  </div>
+                ) : (
+                  ''
+                )}
+              </>
+            ))}
+          </div>
           <div className="w-full h-30 box-border p-2 bg-[#e9e9e9]">
             <div className="w-full">
               <div></div>
