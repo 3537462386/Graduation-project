@@ -3,41 +3,61 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-02 14:48:47
+ * @LastEditTime: 2024-05-06 16:15:50
  * @Description: Description
  */
-import { sendReq, getGroup, getUser } from '@/api';
+import { sendReq, getGroup, getUser, addGroup } from '@/api';
 import { setAddFriendVisible } from '@/store/modules/common';
 import { CloseOutlined, SearchOutlined } from '@ant-design/icons';
 import { Avatar, Button, Input, Tabs, TabsProps, message } from 'antd';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { debounce } from 'lodash';
 interface MsgListItemPropsType {
+  item: itemType;
+}
+interface itemType {
   name: string;
   avatar: string;
   username: string;
-  friendId: string;
+  _id: string;
+  friends?: [];
+  users?: [];
 }
 const MsgListItem = (props: MsgListItemPropsType) => {
-  const { avatar, name, username, friendId } = props;
+  const { item } = props;
   const userInfo = useSelector((state: any) => state.userSlice);
   const addFriend = async () => {
-    const res = await sendReq({
-      to: friendId,
-      from: userInfo.userId
-    });
-    if (res.code === 1) {
-      message.success('发送成功');
+    if (item._id === userInfo.userId) {
+      message.success('不能添加你自己');
+      return;
+    }
+    if (Object.values(item).includes('friends')) {
+      const res = await sendReq({
+        to: item._id,
+        from: userInfo.userId
+      });
+      if (res.code === 1) {
+        message.success('发送成功');
+      }
+    } else {
+      const res = await addGroup({
+        GroupId: item._id,
+        userId: userInfo.userId
+      });
+      if (res.code === 1) {
+        message.success('添加成功');
+      }
     }
   };
   return (
     <div
       className={`w-full h-16 box-border p-2 flex items-center justify-between hover:bg-[#e9e9e9] rounded-md`}
     >
-      <Avatar src={avatar} size={44} />
+      <Avatar src={item.avatar} size={44} />
       <div className="flex-1 h-full mx-2 flex flex-col justify-between items-start">
-        <span>{name}</span>
-        <span>{username}</span>
+        <span>{item.name}</span>
+        <span>{item.username}</span>
       </div>
       <div className="flex h-full flex-col justify-around">
         <Button onClick={addFriend}>添加</Button>
@@ -61,6 +81,7 @@ export const AddFriend = () => {
     setGroupListData(groupData.data);
     setAllListData([...userData.data, ...groupData.data]);
   };
+  const debouncedSearch = debounce(searchData, 800);
   const items: TabsProps['items'] = [
     {
       key: '1',
@@ -68,13 +89,7 @@ export const AddFriend = () => {
       children: (
         <>
           {allListData.map((item, index) => (
-            <MsgListItem
-              key={index}
-              avatar={item.avatar}
-              name={item.name}
-              username={item.username}
-              friendId={item._id}
-            />
+            <MsgListItem key={index} item={item} />
           ))}
         </>
       )
@@ -85,13 +100,7 @@ export const AddFriend = () => {
       children: (
         <>
           {userListData.map((item, index) => (
-            <MsgListItem
-              key={index}
-              avatar={item.avatar}
-              name={item.name}
-              username={item.username}
-              friendId={item._id}
-            />
+            <MsgListItem key={index} item={item} />
           ))}
         </>
       )
@@ -102,13 +111,7 @@ export const AddFriend = () => {
       children: (
         <>
           {groupListData.map((item, index) => (
-            <MsgListItem
-              key={index}
-              avatar={item.avatar}
-              name={item.name}
-              username={item.username}
-              friendId={item._id}
-            />
+            <MsgListItem key={index} item={item} />
           ))}
         </>
       )
@@ -129,7 +132,7 @@ export const AddFriend = () => {
         placeholder="输入搜索关键词"
         prefix={<SearchOutlined />}
         className="w-full"
-        onChange={(e) => searchData(e.target.value)}
+        onChange={(e) => debouncedSearch(e.target.value)}
       />
       <Tabs defaultActiveKey="1" items={items} />
     </div>

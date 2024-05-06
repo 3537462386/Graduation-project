@@ -21,8 +21,8 @@ router.post('/user/getAvatar', user_controller.getAvatar)
 router.post('/user/getUser', user_controller.getUser)
 // 查询好友
 router.post('/user/getFriends', user_controller.getFriends)
-// // 发送好友申请
-// router.post('/user/addUser', user_controller.addUser)
+// 查询好友状态
+router.post('/user/getFriendsStatus', user_controller.getFriendsStatus)
 // // 同意好友申请
 // router.post('/user/agreeUser', user_controller.agreeUser)
 /* group. */
@@ -30,6 +30,11 @@ router.post('/user/getFriends', user_controller.getFriends)
 router.post('/group/getAllGroup', group_controller.getAllGroup)
 // 搜索群组
 router.post('/group/getGroup', group_controller.getGroup)
+// 添加群组
+router.post('/group/addGroup', group_controller.addGroup)
+// 得到所有聊天
+router.post('/group/getAllChatGroup', group_controller.getAllChatGroup)
+
 
 /* msg. */
 // 新消息

@@ -2,12 +2,13 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-30 18:39:40
+ * @LastEditTime: 2024-05-05 14:17:17
  * @Description: Description
  */
 const User_col = require('../model/user')
 const config = require('../config/config')
 const Group_col = require('../model/group')
+const Msg_col = require('../model/message')
 // 登录操作
 const login = async (ctx, next) => {
 	// console.log('body:', ctx.request.body);
@@ -152,7 +153,7 @@ const getUser = async (ctx, next) => {
 
 
 // 查询好友
-const getFriends = async (ctx, next) => {
+const getFriendsStatus = async (ctx, next) => {
 	const { username } = ctx.request.body;
 	const friends = [];
 	// 查表
@@ -166,7 +167,64 @@ const getFriends = async (ctx, next) => {
 				const friend_data = await User_col.findOne({
 					_id: user_data.friends[i]
 				})
-				friends.push(friend_data)
+				const count = await Msg_col.countDocuments({ to: user_data._id, from: friend_data._id, isRead: false });
+				const res1 = await Msg_col.find({ $and: [{ to: user_data._id }, { from: friend_data._id }] })
+				const res2 = await Msg_col.find({ $and: [{ to: friend_data._id }, { from: user_data._id  }] })
+				const result = res1.concat(res2)
+				result.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+				// const date = new Date(result[0].timestamp);
+				// const options = { timeZone: "Asia/Shanghai" };
+				// const localTime = date.toLocaleString("zh-CN", options);
+				const currentDateTime = new Date();
+				const timestampDateTime = new Date(result[0].timestamp);
+				const currentYear = currentDateTime.getFullYear();
+				const currentMonth = currentDateTime.getMonth();
+				const currentDay = currentDateTime.getDate();
+				const timestampYear = timestampDateTime.getFullYear();
+				const timestampMonth = timestampDateTime.getMonth();
+				const timestampDay = timestampDateTime.getDate();
+				let localTime = '';
+				// 判断日期
+				if (currentYear === timestampYear && currentMonth === timestampMonth && currentDay === timestampDay) {
+					// 当天，返回时分
+					const hours = timestampDateTime.getHours();
+					const minutes = timestampDateTime.getMinutes();
+					const time = `${hours}:${minutes}`;
+					// console.log("今天 " + time);
+					localTime = time;
+				} else if (
+					currentYear === timestampYear && 
+					currentMonth === timestampMonth && 
+					currentDay - timestampDay === 1
+				) {
+					// 昨天
+					// console.log("昨天");
+					localTime = '昨天';
+				} else if (
+					currentYear === timestampYear && 
+					currentMonth === timestampMonth && 
+					currentDay - timestampDay === 2
+				) {
+					// 前天
+					// console.log("前天");
+					localTime = '前天';
+				} else {
+					// 更早，返回年月日
+					const formattedDate = timestampDateTime.toLocaleDateString("zh-CN");
+					// console.log(formattedDate);
+					localTime = formattedDate;
+				}
+				friends.push({
+					_id: friend_data._id,
+					username: friend_data.username,
+					name: friend_data.name,
+					avatar: friend_data.avatar,
+					newMsg: count,
+					lastMsg: {
+						timestamp: localTime,
+						content: result[0].content
+					}
+				})
 			}
 			ctx.body = {
 				code: 1,
@@ -184,7 +242,51 @@ const getFriends = async (ctx, next) => {
 	} catch (err) {
 		ctx.body = {
 			code: -1,
-			msg: '查询失败'
+			msg: err
+		}
+		return;
+	}
+}
+
+// 查询好友
+const getFriends = async (ctx, next) => {
+	const { username } = ctx.request.body;
+	const friends = [];
+	// 查表
+	try {
+		const user_data = await User_col.findOne({
+			username: username
+		})
+		if (user_data.friends) {
+			// console.log(user_data.friends);
+			for(let i = 0; i < user_data.friends.length; i++) {
+				const friend_data = await User_col.findOne({
+					_id: user_data.friends[i]
+				})
+				friends.push({
+					_id: friend_data._id,
+					username: friend_data.username,
+					name: friend_data.name,
+					avatar: friend_data.avatar
+				})
+			}
+			ctx.body = {
+				code: 1,
+				data: friends,
+				msg: '查询成功'
+			}
+			return;
+		} else {
+			ctx.body = {
+				code: -1,
+				msg: '查询失败'
+			}
+			return;
+		}
+	} catch (err) {
+		ctx.body = {
+			code: -1,
+			msg: err
 		}
 		return;
 	}
@@ -195,5 +297,6 @@ module.exports = {
 	register,
 	getAvatar,
 	getUser,
-	getFriends
+	getFriends,
+	getFriendsStatus
 }

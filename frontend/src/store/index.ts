@@ -13,6 +13,7 @@ import {
 } from '@reduxjs/toolkit';
 import commonSlice from './modules/common';
 import userSlice from './modules/user';
+import nowFocusSlice from './modules/nowFocus';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 // import titleSlice from './modules/title';
@@ -33,7 +34,8 @@ const persistConfig = {
 
 const reducer = combineReducers({
   commonSlice,
-  userSlice
+  userSlice,
+  nowFocusSlice
 });
 
 // 创建持久化Reducer

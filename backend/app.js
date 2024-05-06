@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-30 17:29:41
+ * @LastEditTime: 2024-05-06 15:49:07
  * @Description: Description
  */
 const Koa = require('koa')
@@ -32,16 +32,16 @@ socketIO.on('connection', (socket) => {
 
   // 监听和在控制台打印消
   socket.on('message', (data) => {
-    console.log(data);
+    // console.log(data);
     // socketIO.emit('messageResponse', data);
     // 向指定用户发送消息
-    socketIO.to(data.to).emit('message', data);
+    socketIO.to(data[0].to._id).emit('message', data);
   });
 
   socket.on('newJoin', (data) => {
     // console.log(data);
     //加入房间
-    if(data.length == 6){
+    if(data.length !== 0){
       socket.join(data);
       onlineUser.add(data)
       console.log(onlineUser);

@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-02 17:00:50
+ * @LastEditTime: 2024-05-05 13:26:38
  * @Description: Description
  */
 const User_col = require('../model/user')
@@ -20,12 +20,20 @@ const newMsg = async (ctx, next) => {
             content
 		})
 		if (result) {
-			ctx.body = {
+                fromData = await User_col.findOne({_id:result.from})
+                toData = await User_col.findOne({_id:result.to})
+                const res = {
+                    from: fromData,
+                    to: toData,
+                    content: result.content,
+                    _id: result._id,
+                    timestamp: result.timestamp
+                }
+            ctx.body = {
 				code: 1,
-                data: result,
-				msg: '新消息创建成功'
+                data: res,
+				msg: '查询成功'
 			}
-			return;
 		}
 	} catch (err) {
 		ctx.body = {
@@ -40,23 +48,37 @@ const newMsg = async (ctx, next) => {
 const getMsg = async (ctx, next) => {
 	const { to,from } = ctx.request.body;
 	try {
-		const result = await Msg_col.find({ $and: [{ to: to }, { from: from }] })
+		const res1 = await Msg_col.find({ $and: [{ to: to }, { from: from }] })
+		const res2 = await Msg_col.find({ $and: [{ to: from }, { from: to }] })
+		await Msg_col.updateMany({ $and: [{ to: from }, { from: to }] }, { $set: { isRead: true } })
+		const result = res1.concat(res2)
 		if (result) {
-            const res = [];
+            const msgList = [];
             for(let i = 0; i < result.length; i++) {
                 fromData = await User_col.findOne({_id:result[i].from})
                 toData = await User_col.findOne({_id:result[i].to})
-                res.push({
-                    from: fromData,
-                    to: toData,
+                msgList.push({
+                    from: {
+						_id: fromData._id,
+						username: fromData.username,
+						name: fromData.name,
+						avatar: fromData.avatar
+					},
+                    to: {
+						_id: toData._id,
+						username: toData.username,
+						name: toData.name,
+						avatar: toData.avatar
+					},
                     content: result[i].content,
                     _id: result[i]._id,
                     timestamp: result[i].timestamp
                 })
             }
+			msgList.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
             ctx.body = {
 				code: 1,
-                data: res,
+                data: msgList,
 				msg: '查询成功'
 			}
 		}

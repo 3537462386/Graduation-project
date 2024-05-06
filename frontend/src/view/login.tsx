@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-03-28 15:02:08
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-30 18:08:37
+ * @LastEditTime: 2024-05-05 14:55:58
  * @Description: Description
  */
 import { useState } from 'react';
@@ -125,11 +125,11 @@ export const Login = () => {
                     rules={[
                       {
                         required: true,
-                        message: 'Please input your username!'
+                        message: '请输入你的账号!'
                       },
                       {
                         pattern: /^\d{6}$/,
-                        message: 'Username must be 6 digits!'
+                        message: '账号为6为数字!'
                       }
                     ]}
                   >
@@ -145,12 +145,11 @@ export const Login = () => {
                     rules={[
                       {
                         required: true,
-                        message: 'Please input your password!'
+                        message: '请输入你的密码!'
                       },
                       {
                         pattern: /^[a-zA-Z0-9]{4,8}$/,
-                        message:
-                          'Password must be 4 to 8 characters and can only contain letters or numbers!'
+                        message: '密码为4-8位字母和数字组合!'
                       }
                     ]}
                   >
@@ -185,7 +184,7 @@ export const Login = () => {
                     rules={[
                       {
                         required: true,
-                        message: 'Please input your username!'
+                        message: '请输入你的昵称!'
                       }
                     ]}
                   >
@@ -197,11 +196,11 @@ export const Login = () => {
                     rules={[
                       {
                         required: true,
-                        message: 'Please input your username!'
+                        message: '请输入你的账号!'
                       },
                       {
                         pattern: /^\d{6}$/,
-                        message: 'Username must be 6 digits!'
+                        message: '账号为6为数字!'
                       }
                     ]}
                   >
@@ -213,12 +212,11 @@ export const Login = () => {
                     rules={[
                       {
                         required: true,
-                        message: 'Please input your password!'
+                        message: '请输入你的密码!'
                       },
                       {
                         pattern: /^[a-zA-Z0-9]{4,8}$/,
-                        message:
-                          'Password must be 4 to 8 characters and can only contain letters or numbers!'
+                        message: '密码为4-8位字母和数字组合!'
                       }
                     ]}
                   >

@@ -1,7 +1,7 @@
 const User_col = require('../model/user')
 const config = require('../config/config')
 const Freq_col = require('../model/friendreq')
-
+const Msg_col = require('../model/message')
 
 // 发送好友申请
 const sendReq = async (ctx, next) => {
@@ -76,6 +76,11 @@ const dealReq = async (ctx, next) => {
         )
         await User_col.findByIdAndUpdate(res.to, { $push: { friends: res.from } })
 		await User_col.findByIdAndUpdate(res.from, { $push: { friends: res.to } })
+		await Msg_col.create({
+			to: res.from,
+            from: res.to,
+            content: '我们已经是好友了，快来聊天吧！'
+		})
 		if (res) {
 			ctx.body = {
 				code: 1,

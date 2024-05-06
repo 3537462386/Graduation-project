@@ -13,12 +13,12 @@ const Schema = mongoose.Schema;
 const FriendReqSchema = new Schema({
 	to: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'user',
         required: true
 	},
     from: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'user',
         required: true
     },
     status: {

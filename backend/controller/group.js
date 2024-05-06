@@ -1,6 +1,13 @@
+/*
+ * @Author: L·W
+ * @Date: 2024-04-25 17:09:37
+ * @LastEditors: L·W
+ * @LastEditTime: 2024-05-06 17:48:48
+ * @Description: Description
+ */
 const Group_col = require('../model/group')
 const config = require('../config/config')
-
+const Msg_col = require('../model/message')
 // 获取所有群组
 const getAllGroup = async (ctx, next) => {
   // console.log('info',ctx.request.body);
@@ -14,6 +21,97 @@ const getAllGroup = async (ctx, next) => {
     }
   }
 }
+
+// 得到全体聊天群组
+const getAllChatGroup = async (ctx, next) => {
+  const { userId } = ctx.request.body;
+	const groups = [];
+	// 查表
+	try {
+		const group_data = await Group_col.find({ users: { $in: [userId] } })
+		if (group_data) {
+			console.log(group_data);
+			for(let i = 0; i < group_data.length; i++) {
+				// const friend_data = await User_col.findOne({
+				// 	_id: user_data.friends[i]
+				// })
+				const msgRes = await Msg_col.find({ to: group_data[i]._id })
+				msgRes.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+				// const date = new Date(result[0].timestamp);
+				// const options = { timeZone: "Asia/Shanghai" };
+				// const localTime = date.toLocaleString("zh-CN", options);
+				const currentDateTime = new Date();
+				const timestampDateTime = new Date(msgRes[0].timestamp);
+				const currentYear = currentDateTime.getFullYear();
+				const currentMonth = currentDateTime.getMonth();
+				const currentDay = currentDateTime.getDate();
+				const timestampYear = timestampDateTime.getFullYear();
+				const timestampMonth = timestampDateTime.getMonth();
+				const timestampDay = timestampDateTime.getDate();
+				let localTime = '';
+				// 判断日期
+				if (currentYear === timestampYear && currentMonth === timestampMonth && currentDay === timestampDay) {
+					// 当天，返回时分
+					const hours = timestampDateTime.getHours();
+					const minutes = timestampDateTime.getMinutes();
+					const time = `${hours}:${minutes}`;
+					// console.log("今天 " + time);
+					localTime = time;
+				} else if (
+					currentYear === timestampYear && 
+					currentMonth === timestampMonth && 
+					currentDay - timestampDay === 1
+				) {
+					// 昨天
+					// console.log("昨天");
+					localTime = '昨天';
+				} else if (
+					currentYear === timestampYear && 
+					currentMonth === timestampMonth && 
+					currentDay - timestampDay === 2
+				) {
+					// 前天
+					// console.log("前天");
+					localTime = '前天';
+				} else {
+					// 更早，返回年月日
+					const formattedDate = timestampDateTime.toLocaleDateString("zh-CN");
+					// console.log(formattedDate);
+					localTime = formattedDate;
+				}
+				groups.push({
+					_id: group_data[i]._id,
+					username: group_data[i].username,
+					name: group_data[i].name,
+					avatar: group_data[i].avatar,
+					lastMsg: {
+						timestamp: localTime,
+						content: msgRes[0].content
+					}
+				})
+			}
+			ctx.body = {
+				code: 1,
+				data: groups,
+				msg: '查询成功'
+			}
+			return;
+		} else {
+			ctx.body = {
+				code: -1,
+				msg: '查询失败'
+			}
+			return;
+		}
+	} catch (err) {
+		ctx.body = {
+			code: -1,
+			msg: err
+		}
+		return;
+	}
+}
+
 // 搜索群组
 const getGroup = async (ctx, next) => {
   const { searchName } = ctx.request.body;
@@ -31,93 +129,28 @@ const getGroup = async (ctx, next) => {
     }
   ]
 }
-// 编辑并保存学生信息
-const updatestudent = async (ctx, next) => {
-  // console.log('account:', ctx.request.body);
-  let account = ctx.request.body
-  let updateAccount = {
-    _id: account._id,
-    student_id: account.student_id,
-    class: account.class,
-    department: account.department,
-    major: account.major,
-    gender: account.gender,
-    age: account.age,
-    name: account.name,
-    phone_number: account.phone_number,
-    photo: account.photo,
-    grade: account.grade
-  }
-  const user_stu = await Group_col.updateOne({
-    _id: ctx.request.body._id
-  }, { $set: updateAccount }).then(async (res) => {
-    // console.log(res,'result');
-    if (res.modifiedCount) {
-      const result = await Group_col.findOne({ _id: ctx.request.body._id })
-      // console.log(result, 'result');
-      ctx.body = {
-        code: 1,
-        msg: '更新成功',
-        data: result
-      }
-    }
-  })
-}
 
-// 增加学生信息
-const addstudent = async (ctx, next) => {
-  let account = ctx.request.body
-  let addAccount = {
-    student_id: account.student_id,
-    class: account.class,
-    department: account.department,
-    major: account.major,
-    gender: account.gender,
-    age: account.age,
-    name: account.name,
-    phone_number: account.phone_number,
-    photo: account.photo,
-    grade: account.grade
-  }
-  const result = await Group_col.create(addAccount)
-  ctx.body = {
-    code: 1,
-    msg: '添加成功',
-    data: result
-  }
-}
-
-// 删除学生信息
-const deletestudent = async (ctx, next) => {
-  try {
-    const { _id } = ctx.request.body
-    const result = await Group_col.deleteOne({ _id: _id })
-    if (result && result.deletedCount > 0) {
-      ctx.body = {
-        code: 1,
-        msg: '删除成功',
-        data: result,
-      };
-    } else {
-      ctx.body = {
-        code: -1,
-        msg: '删除失败',
-        data: result,
-      };
+// 添加群组
+const addGroup = async (ctx, next) => {
+  const { GroupId,userId } = ctx.request.body;
+  const result =  await Group_col.findByIdAndUpdate(GroupId, { $push: { users: userId } })
+  if (result) {
+    ctx.body = {
+      code: 1,
+      msg: '添加成功',
+      data: result
     }
-  } catch (err) {
-    console.log(err);
+  }else [
     ctx.body = {
       code: -1,
-      msg: '服务器异常，请稍后再试！',
-      data: err.message,
-    };
-  }
-};
-
-
+      msg: '查无此人'
+    }
+  ]
+}
 
 module.exports = {
   getAllGroup,
-  getGroup
+  getGroup,
+  addGroup,
+  getAllChatGroup
 }

@@ -5,7 +5,7 @@
  * @LastEditTime: 2024-04-26 16:47:57
  * @Description: Description
  */
-// 用户表
+// 群组表
 const mongoose = require('mongoose')
 // 专门做映射表
 const Schema = mongoose.Schema;

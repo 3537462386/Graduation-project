@@ -31,9 +31,18 @@ export const getUser = async (data: any): Promise<resState> => {
 export const getFriends = async (data: any): Promise<resState> => {
   return request.post('/user/getFriends', data);
 };
+export const getFriendsStatus = async (data: any): Promise<resState> => {
+  return request.post('/user/getFriendsStatus', data);
+};
 
+export const getAllGroup = async (data: any): Promise<resState> => {
+  return request.post('/group/getAllChatGroup', data);
+};
 export const getGroup = async (data: any): Promise<resState> => {
   return request.post('/group/getGroup', data);
+};
+export const addGroup = async (data: any): Promise<resState> => {
+  return request.post('/group/addGroup', data);
 };
 
 export const newMsg = async (data: any): Promise<resState> => {
