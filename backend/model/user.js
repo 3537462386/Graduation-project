@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-02 14:03:32
+ * @LastEditTime: 2024-05-08 17:52:37
  * @Description: Description
  */
 // 用户表
@@ -26,9 +26,7 @@ const UserSchema = new Schema({
 	},
 	name: {
 		type: String,
-        require: true,
-		minlength: 1,
-		maxlength: 6
+        require: true
 	},
 	avatar: {
 		type: String,

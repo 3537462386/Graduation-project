@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-12 15:50:19
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-02 14:15:56
+ * @LastEditTime: 2024-05-07 15:28:40
  * @Description: Description
  */
 import { request } from '@/utils/axios';
@@ -44,12 +44,18 @@ export const getGroup = async (data: any): Promise<resState> => {
 export const addGroup = async (data: any): Promise<resState> => {
   return request.post('/group/addGroup', data);
 };
+export const createGroup = async (data: any): Promise<resState> => {
+  return request.post('/group/createGroup', data);
+};
 
 export const newMsg = async (data: any): Promise<resState> => {
   return request.post('/msg/newMsg', data);
 };
 export const getMsg = async (data: any): Promise<resState> => {
   return request.post('/msg/getMsg', data);
+};
+export const getGroupMsg = async (data: any): Promise<resState> => {
+  return request.post('/msg/getGroupMsg', data);
 };
 
 export const sendReq = async (data: any): Promise<resState> => {

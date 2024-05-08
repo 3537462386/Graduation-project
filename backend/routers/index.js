@@ -34,13 +34,16 @@ router.post('/group/getGroup', group_controller.getGroup)
 router.post('/group/addGroup', group_controller.addGroup)
 // 得到所有聊天
 router.post('/group/getAllChatGroup', group_controller.getAllChatGroup)
-
+// 创建聊天
+router.post('/group/createGroup', group_controller.createGroup)
 
 /* msg. */
 // 新消息
 router.post('/msg/newMsg', msg_controller.newMsg)
 // 查询消息
 router.post('/msg/getMsg', msg_controller.getMsg)
+// 查询群组消息
+router.post('/msg/getGroupMsg', msg_controller.getGroupMsg)
 
 /* friendReq. */
 // 新消息

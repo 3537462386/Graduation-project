@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-11 17:04:44
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-02 16:03:19
+ * @LastEditTime: 2024-05-08 15:30:11
  * @Description: Description
  */
 import { getFriends, getFReq, dealReq } from '@/api';
@@ -89,7 +89,7 @@ export const Contacts = () => {
     <div className="h-full flex-1 flex flex-col">
       <HeaderBox />
       <div className="flex-1 w-full flex">
-        <div className="w-70 h-full overflow-hidden">
+        <div className="w-70 h-full overflow-hidden select-none">
           <div
             className="w-full h-10 px-4 flex items-center justify-between hover:bg-[#e9e9e9]"
             onClick={seeFriends}

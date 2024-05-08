@@ -15,6 +15,7 @@ export interface FocusType {
   _id?: string;
   username?: string;
   name?: string;
+  isGroupMsg?: boolean;
 }
 const nowFocusSlice = createSlice({
   name: 'nowFocus',
@@ -24,6 +25,7 @@ const nowFocusSlice = createSlice({
       state.username = action.payload.username;
       state.name = action.payload.name;
       state._id = action.payload._id;
+      state.isGroupMsg = action.payload.isGroupMsg;
     }
   }
 });

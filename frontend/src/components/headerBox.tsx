@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-11 13:58:14
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-29 16:55:01
+ * @LastEditTime: 2024-05-08 17:26:25
  * @Description: Description
  */
 import { Button, Dropdown, Input } from 'antd';
@@ -15,7 +15,10 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useDispatch } from 'react-redux';
-import { setAddFriendVisible } from '@/store/modules/common';
+import {
+  setAddFriendVisible,
+  setCreateGroupVisible
+} from '@/store/modules/common';
 import { useLocation } from 'react-router-dom';
 interface PropsType {
   name?: string;
@@ -48,7 +51,7 @@ export const HeaderBox = (props: PropsType) => {
   const onClick: MenuProps['onClick'] = ({ key }) => {
     console.log('click', key);
     if (key === '1') {
-      console.log('发起群聊');
+      dispatch(setCreateGroupVisible());
     } else {
       dispatch(setAddFriendVisible());
     }

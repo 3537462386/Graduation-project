@@ -3,16 +3,24 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-06 17:00:39
+ * @LastEditTime: 2024-05-08 15:27:00
  * @Description: Description
  */
-import { getFriendsStatus, newMsg, getMsg, getAllGroup } from '@/api';
+import {
+  getFriendsStatus,
+  newMsg,
+  getMsg,
+  getAllGroup,
+  getGroupMsg
+} from '@/api';
 import { HeaderBox } from '@/components/headerBox';
 import { FocusType, setNowFocus } from '@/store/modules/nowFocus';
 import { UserType, GroupType, MsgType } from '@/types';
-import { Avatar, Badge, Button, Input } from 'antd';
+import { MehOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Button, Col, Input, Modal, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import emoji from '@/utils/emoji.json';
 import io from 'socket.io-client';
 interface MsgListItemPropsType {
   item?: UserType | GroupType;
@@ -20,6 +28,8 @@ interface MsgListItemPropsType {
   nowFocus?: FocusType;
   setMsgListData?: any;
   getFriendsList?: any;
+  getAllGroups?: any;
+  isGroupMsg?: boolean;
 }
 // interface MsgItemPropsType {
 //   avatar: string;
@@ -31,7 +41,7 @@ interface MsgListItemPropsType {
 //    )
 // }
 const MsgListItem = (props: MsgListItemPropsType) => {
-  const { item, setMsgListData, getFriendsList } = props;
+  const { item, setMsgListData, getFriendsList, isGroupMsg } = props;
   const userInfo = useSelector((state: any) => state.userSlice);
   const nowFocus = useSelector((state: any) => state.nowFocusSlice);
   const dispatch = useDispatch();
@@ -40,15 +50,24 @@ const MsgListItem = (props: MsgListItemPropsType) => {
       setNowFocus({
         _id: item?._id,
         username: item?.username,
-        name: item?.name
+        name: item?.name,
+        isGroupMsg: isGroupMsg
       })
     );
-    const res = await getMsg({
-      from: userInfo.userId,
-      to: item?._id
-    });
-    setMsgListData(res.data);
-    getFriendsList();
+    if (!isGroupMsg) {
+      const res = await getMsg({
+        from: userInfo.userId,
+        to: item?._id
+      });
+      setMsgListData(res.data);
+      getFriendsList();
+    } else {
+      const res = await getGroupMsg({
+        groupId: item?._id
+      });
+      setMsgListData(res.data);
+      // getAllGroups()
+    }
   };
   return (
     <div
@@ -91,8 +110,13 @@ export const Msg = () => {
   const [msgListData, setMsgListData] = useState<MsgType[]>([]);
   const userInfo = useSelector((state: any) => state.userSlice);
   const nowFocus = useSelector((state: any) => state.nowFocusSlice);
-  // const dispatch = useDispatch();
+  const onlineUser = useSelector((state: any) => state.commonSlice.onlineUser);
   const [inputMsg, setInputMsg] = useState('');
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const { TextArea } = Input;
+  const emojiArray = emoji.data
+    .split(',')
+    .map((emoji, index) => ({ id: 123 + index, emoji }));
 
   const getFriendsList = async () => {
     const { data: friendData } = await getFriendsStatus({
@@ -116,14 +140,13 @@ export const Msg = () => {
     const newMessage: MsgType = res.data;
     const updatedMsgListData = [newMessage, ...msgListData];
     setMsgListData(updatedMsgListData);
-    if (res.code === 1) {
+    setInputMsg('');
+    getAllGroups();
+    getFriendsList();
+    if (res.code === 1 && onlineUser.has(nowFocus?._id)) {
       // console.log('发送；');
       socket.emit('message', updatedMsgListData);
-    } else {
-      alert('发送失败');
     }
-    setInputMsg('');
-    getFriendsList();
   };
 
   useEffect(() => {
@@ -154,38 +177,55 @@ export const Msg = () => {
     <div className="h-full flex-1 flex flex-col">
       <HeaderBox name={nowFocus?.name} />
       <div className="flex-1 w-full flex">
-        <div className="w-70 h-full overflow-hidden">
-          {/* <MsgListItem
-            item={allChat}
-            setMsgListData={setMsgListData}
-            getFriendsList={getFriendsList}
-          /> */}
+        <div className="w-70 h-full overflow-hidden select-none">
+          {groupListData?.map((item, index) => (
+            <MsgListItem
+              key={index}
+              item={item}
+              isGroupMsg={true}
+              setMsgListData={setMsgListData}
+            />
+          ))}
           {friendListData?.map((item, index) => (
             <MsgListItem
               key={index}
               item={item}
+              isGroupMsg={false}
               setMsgListData={setMsgListData}
               getFriendsList={getFriendsList}
             />
           ))}
         </div>
         <div className="h-full flex-1 flex flex-col">
-          <div className="app h-[318px] w-full flex flex-col-reverse bg-[#f2f2f2] px-6 overflow-scroll overflow-x-hidden">
+          <div className="h-[318px] w-full flex flex-col-reverse bg-[#f2f2f2] px-6 overflow-scroll overflow-x-hidden">
             {msgListData?.map((item, index) => (
               <div
-                className={`w-full h-15 my-2 flex items-center ${item?.from?.username !== userInfo.username ? 'justify-start' : 'justify-end'} `}
+                className={`w-full my-2 flex items-start ${item?.from?.username !== userInfo.username ? 'justify-start' : 'justify-end'}`}
                 key={index}
               >
                 {item?.from?.username !== userInfo.username ? (
-                  <Avatar src={item?.to?.avatar} size={45} />
+                  <Avatar
+                    src={
+                      nowFocus?.isGroupMsg
+                        ? item?.from?.avatar
+                        : item?.to?.avatar
+                    }
+                    size={45}
+                  />
                 ) : (
                   ''
                 )}
                 <div
-                  className={`h-10 flexCenter px-4 rounded-md ${item?.from?.username !== userInfo.username ? 'bg-white' : 'bg-[#0099ff]'} ${item?.from?.username !== userInfo.username ? '' : 'text-white'} `}
+                  className={`flex flex-col ${item?.from?.username !== userInfo.username ? 'items-start' : 'items-end'}`}
                 >
-                  {item?.content}
+                  {nowFocus?.isGroupMsg ? <div>{item?.from?.name}</div> : ''}
+                  <div
+                    className={`min-h-10 flexCenter max-w-125 px-4 rounded-md ${item?.from?.username !== userInfo.username ? 'bg-white' : 'bg-[#0099ff]'} ${item?.from?.username !== userInfo.username ? '' : 'text-white'} `}
+                  >
+                    {item?.content}
+                  </div>
                 </div>
+
                 {item?.from?.username !== userInfo.username ? (
                   ''
                 ) : (
@@ -196,13 +236,42 @@ export const Msg = () => {
           </div>
           <div className="w-full h-30 box-border p-2 bg-[#e9e9e9]">
             <div className="w-full">
-              <div></div>
+              <div className="relative">
+                <MehOutlined
+                  className={`text-[24px] ${emojiOpen ? 'text-[#0099ff]' : ''} `}
+                  onClick={() => setEmojiOpen(!emojiOpen)}
+                />
+                {emojiOpen ? (
+                  <div className="absolute flexCenter bottom-9 w-50 h-50 bg-white rounded-md border border-solid border-[#e9e9e9] shadow-lg">
+                    <Row
+                      // gutter={8}
+                      className="w-45 h-45 overflow-scroll overflow-x-hidden"
+                    >
+                      {emojiArray.map((item) => {
+                        return (
+                          <Col span={4} key={item.id}>
+                            <div
+                              className="text-[20px] w-7 h-7 select-none flexCenter mb-2 rounded-md cursor-pointer hover:bg-[#eeeded]"
+                              onClick={() => setInputMsg(inputMsg + item.emoji)}
+                            >
+                              {item.emoji}
+                            </div>
+                          </Col>
+                        );
+                      })}
+                    </Row>
+                  </div>
+                ) : (
+                  ''
+                )}
+              </div>
               <div></div>
             </div>
-            <Input
+            <TextArea
               onChange={(e) => {
                 setInputMsg(e.target.value);
               }}
+              autoSize={{ minRows: 2, maxRows: 2 }}
               variant="borderless"
               value={inputMsg}
               className="w-full h-10"

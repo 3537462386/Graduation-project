@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-25 17:09:37
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-26 16:47:57
+ * @LastEditTime: 2024-05-08 17:52:51
  * @Description: Description
  */
 // 群组表
@@ -20,9 +20,7 @@ const GroupSchema = new Schema({
 	},
 	name: {
 		type: String,
-        require: true,
-		minlength: 1,
-		maxlength: 6
+        require: true
 	},
 	avatar: {
 		type: String,

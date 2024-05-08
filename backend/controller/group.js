@@ -2,12 +2,13 @@
  * @Author: L·W
  * @Date: 2024-04-25 17:09:37
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-06 17:48:48
+ * @LastEditTime: 2024-05-08 17:57:16
  * @Description: Description
  */
 const Group_col = require('../model/group')
 const config = require('../config/config')
 const Msg_col = require('../model/message')
+const User_col = require('../model/user')
 // 获取所有群组
 const getAllGroup = async (ctx, next) => {
   // console.log('info',ctx.request.body);
@@ -87,7 +88,8 @@ const getAllChatGroup = async (ctx, next) => {
 					lastMsg: {
 						timestamp: localTime,
 						content: msgRes[0].content
-					}
+					},
+					newMsg: 0
 				})
 			}
 			ctx.body = {
@@ -148,9 +150,49 @@ const addGroup = async (ctx, next) => {
   ]
 }
 
+// 创建群组
+const createGroup = async (ctx, next) => {
+	const { users } = ctx.request.body;
+	const all = await Group_col.find()
+	let username = (Math.floor(Math.random() * 90000000) + 10000000).toString(10);
+	for(let i = 0; i < all.length; i++){
+		if(all[i].username === username){
+		  username = (Math.floor(Math.random() * 90000000) + 10000000).toString(10);
+		}
+	}
+	let name = '';
+	for(let i = 0; i < users.length; i++) {
+		res = await User_col.findOne({_id:users[i]})
+		name += res.name + '、'
+	}
+	const result =  await Group_col.create({ 
+		username: username,
+		name: name,
+		users: users
+	})
+	await Msg_col.create({
+		to: result._id,
+		from: users[users.length -1],
+		content: '我发起了群聊，快来聊天吧！'
+	})
+	if (res) {
+	  ctx.body = {
+		code: 1,
+		msg: '创建成功',
+		data: result
+	  }
+	}else [
+	  ctx.body = {
+		code: -1,
+		msg: '查无此人'
+	  }
+	]
+  }
+
 module.exports = {
   getAllGroup,
   getGroup,
   addGroup,
-  getAllChatGroup
+  getAllChatGroup,
+  createGroup
 }
