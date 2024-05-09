@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-05 14:17:17
+ * @LastEditTime: 2024-05-09 17:50:32
  * @Description: Description
  */
 const User_col = require('../model/user')
@@ -77,9 +77,9 @@ const register = async (ctx, next) => {
 
 	try {
 		let newUser = await User_col.create({
-		username: username,
-		password: password,
-		name: name
+			username: username,
+			password: password,
+			name: name
 		})
 		if (newUser) {
 			const result = await Group_col.findByIdAndUpdate('662b733302bd84ce29d1756b', { $push: { users: newUser._id } })
@@ -128,6 +128,45 @@ const getAvatar = async (ctx, next) => {
 	}
 }
 
+// 修改资料
+const changeInfo = async (ctx, next) => {
+	const { info, userId, avatar, name } = ctx.request.body;
+	// 查表
+	const dateString = info.birthday;
+	const datePart = dateString.substring(0, 10);
+	const year = dateString.substring(0, 4);
+	const age = new Date().getFullYear() - year;
+	try {
+		const result = await User_col.findByIdAndUpdate(userId, {
+			$set: {
+				userInfo:
+				{
+					sex: info.sex,
+					age: age,
+					birthday: datePart,
+					sign: info.sign
+				},
+				avatar,
+				name
+			}
+		}, { new: true })
+		if (result) {
+			ctx.body = {
+				code: 1,
+				msg: '修改成功',
+				data: result
+			}
+			return;
+		}
+	} catch (err) {
+		ctx.body = {
+			code: -1,
+			msg: '用户名不存在'
+		}
+		return;
+	}
+}
+
 // 查询用户
 const getUser = async (ctx, next) => {
 	const { searchName } = ctx.request.body;
@@ -163,13 +202,13 @@ const getFriendsStatus = async (ctx, next) => {
 		})
 		if (user_data.friends) {
 			// console.log(user_data.friends);
-			for(let i = 0; i < user_data.friends.length; i++) {
+			for (let i = 0; i < user_data.friends.length; i++) {
 				const friend_data = await User_col.findOne({
 					_id: user_data.friends[i]
 				})
 				const count = await Msg_col.countDocuments({ to: user_data._id, from: friend_data._id, isRead: false });
 				const res1 = await Msg_col.find({ $and: [{ to: user_data._id }, { from: friend_data._id }] })
-				const res2 = await Msg_col.find({ $and: [{ to: friend_data._id }, { from: user_data._id  }] })
+				const res2 = await Msg_col.find({ $and: [{ to: friend_data._id }, { from: user_data._id }] })
 				const result = res1.concat(res2)
 				result.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 				// const date = new Date(result[0].timestamp);
@@ -193,16 +232,16 @@ const getFriendsStatus = async (ctx, next) => {
 					// console.log("今天 " + time);
 					localTime = time;
 				} else if (
-					currentYear === timestampYear && 
-					currentMonth === timestampMonth && 
+					currentYear === timestampYear &&
+					currentMonth === timestampMonth &&
 					currentDay - timestampDay === 1
 				) {
 					// 昨天
 					// console.log("昨天");
 					localTime = '昨天';
 				} else if (
-					currentYear === timestampYear && 
-					currentMonth === timestampMonth && 
+					currentYear === timestampYear &&
+					currentMonth === timestampMonth &&
 					currentDay - timestampDay === 2
 				) {
 					// 前天
@@ -259,7 +298,7 @@ const getFriends = async (ctx, next) => {
 		})
 		if (user_data.friends) {
 			// console.log(user_data.friends);
-			for(let i = 0; i < user_data.friends.length; i++) {
+			for (let i = 0; i < user_data.friends.length; i++) {
 				const friend_data = await User_col.findOne({
 					_id: user_data.friends[i]
 				})
@@ -298,5 +337,6 @@ module.exports = {
 	getAvatar,
 	getUser,
 	getFriends,
-	getFriendsStatus
+	getFriendsStatus,
+	changeInfo
 }

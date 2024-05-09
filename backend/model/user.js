@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-08 17:52:37
+ * @LastEditTime: 2024-05-09 16:03:35
  * @Description: Description
  */
 // 用户表
@@ -26,11 +26,30 @@ const UserSchema = new Schema({
 	},
 	name: {
 		type: String,
-        require: true
+        require: true,
+		maxlength: 36
 	},
 	avatar: {
 		type: String,
 		default: 'https://pic.imgdb.cn/item/6629c1b90ea9cb140386eb54.jpg'
+	},
+	info: {
+		type: {
+			sex: {
+				type: String
+			},
+			age: {
+				type: String
+			},
+			birthday: {
+				type: String
+			},
+			sign: {
+				type: String,
+				maxlength: 80
+			},
+		},
+		required: false
 	},
 	friends: [{
         type: Schema.Types.ObjectId,

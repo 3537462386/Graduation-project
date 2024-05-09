@@ -34,12 +34,18 @@ export const getFriends = async (data: any): Promise<resState> => {
 export const getFriendsStatus = async (data: any): Promise<resState> => {
   return request.post('/user/getFriendsStatus', data);
 };
+export const changeInfo = async (data: any): Promise<resState> => {
+  return request.post('/user/changeInfo', data);
+};
 
 export const getAllGroup = async (data: any): Promise<resState> => {
   return request.post('/group/getAllChatGroup', data);
 };
 export const getGroup = async (data: any): Promise<resState> => {
   return request.post('/group/getGroup', data);
+};
+export const getGroups = async (data: any): Promise<resState> => {
+  return request.post('/group/getGroups', data);
 };
 export const addGroup = async (data: any): Promise<resState> => {
   return request.post('/group/addGroup', data);

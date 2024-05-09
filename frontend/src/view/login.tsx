@@ -44,7 +44,8 @@ export const Login = () => {
             username: res.data?.username,
             name: res.data?.name,
             avatar: res.data?.avatar,
-            userId: res.data?._id
+            userId: res.data?._id,
+            info: res.data?.info
           })
         );
         message.success('登录成功');

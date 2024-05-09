@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-25 17:09:37
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-08 17:57:16
+ * @LastEditTime: 2024-05-09 14:44:53
  * @Description: Description
  */
 const Group_col = require('../model/group')
@@ -187,12 +187,64 @@ const createGroup = async (ctx, next) => {
 		msg: '查无此人'
 	  }
 	]
-  }
+}
+
+// 查询好友
+const getGroups = async (ctx, next) => {
+	const { userId } = ctx.request.body;
+	const groups = [];
+	// 查表
+	try {
+		const group_data = await Group_col.find({ users: { $in: [userId] } })
+		if (group_data) {
+			for(let i = 0; i < group_data.length; i++) {
+				let users = []
+				for(let j = 0; j < group_data[i].users.length; j++){
+					const res = await User_col.findOne({
+						_id: group_data[i].users[j]
+					})
+					users.push({
+						_id: res._id,
+						username: res.username,
+						name: res.name,
+						avatar: res.avatar
+					})
+				}
+				groups.push({
+					_id: group_data[i]._id,
+					username: group_data[i].username,
+					name: group_data[i].name,
+					avatar: group_data[i].avatar,
+					users: users
+				})
+			}
+			ctx.body = {
+				code: 1,
+				data: groups,
+				msg: '查询成功'
+			}
+			return;
+		} else {
+			ctx.body = {
+				code: -1,
+				msg: '查询失败'
+			}
+			return;
+		}
+	} catch (err) {
+		ctx.body = {
+			code: -1,
+			msg: err
+		}
+		return;
+	}
+}
 
 module.exports = {
   getAllGroup,
   getGroup,
   addGroup,
   getAllChatGroup,
-  createGroup
+  createGroup,
+  getGroups
 }

@@ -13,6 +13,7 @@ import { RouterProvider } from 'react-router-dom';
 import router from './router';
 import { AddFriend } from './components/addFriend';
 import { CreateGroup } from './components/createGroup';
+import { ChangeInfo } from './components/changeInfo';
 import io from 'socket.io-client';
 import { useEffect } from 'react';
 import { setOnlineUser } from './store/modules/common';
@@ -28,6 +29,9 @@ function App() {
   const createGroupVisible = useSelector(
     (state: any) => state.commonSlice.createGroupVisible
   );
+  const changeInfoVisible = useSelector(
+    (state: any) => state.commonSlice.changeInfoVisible
+  );
   useEffect(() => {
     // 监听接收到消息事件
     socket.on('onlineUser', (data) => {
@@ -42,6 +46,7 @@ function App() {
         </div>
         {addFriendVisible && <AddFriend />}
         {createGroupVisible && <CreateGroup />}
+        {changeInfoVisible && <ChangeInfo />}
       </ConfigProvider>
     </>
   );

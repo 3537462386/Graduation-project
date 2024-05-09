@@ -5,6 +5,7 @@
  * @LastEditTime: 2024-04-30 17:48:43
  * @Description: Description
  */
+import { infoType } from '@/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface UserStateType {
@@ -12,13 +13,20 @@ export interface UserStateType {
   name: string;
   avatar: string;
   userId: string;
+  info: infoType;
 }
 
 const initialState: UserStateType = {
   username: '0',
   name: '',
   avatar: '',
-  userId: ''
+  userId: '',
+  info: {
+    sex: '',
+    sign: '',
+    birthday: '',
+    age: ''
+  }
 };
 
 const userSlice = createSlice({
@@ -30,6 +38,7 @@ const userSlice = createSlice({
       state.name = action.payload.name;
       state.avatar = action.payload.avatar;
       state.userId = action.payload.userId;
+      state.info = action.payload.info;
     }
   }
 });

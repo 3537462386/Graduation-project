@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-25 17:09:37
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-02 14:17:01
+ * @LastEditTime: 2024-05-09 16:29:38
  * @Description: Description
  */
 const router = require('koa-router')();
@@ -23,8 +23,8 @@ router.post('/user/getUser', user_controller.getUser)
 router.post('/user/getFriends', user_controller.getFriends)
 // 查询好友状态
 router.post('/user/getFriendsStatus', user_controller.getFriendsStatus)
-// // 同意好友申请
-// router.post('/user/agreeUser', user_controller.agreeUser)
+// 修改资料
+router.post('/user/changeInfo', user_controller.changeInfo)
 /* group. */
 // 获取所有群组
 router.post('/group/getAllGroup', group_controller.getAllGroup)
@@ -36,6 +36,9 @@ router.post('/group/addGroup', group_controller.addGroup)
 router.post('/group/getAllChatGroup', group_controller.getAllChatGroup)
 // 创建聊天
 router.post('/group/createGroup', group_controller.createGroup)
+// 得到群组
+router.post('/group/getGroups', group_controller.getGroups)
+
 
 /* msg. */
 // 新消息

@@ -6,6 +6,12 @@
  * @LastEditTime: 2024-05-05 13:44:50
  * @Description: Description
  */
+export interface infoType {
+  sign?: string;
+  sex?: string;
+  age?: string;
+  birthday?: string;
+}
 export interface UserType {
   _id?: string;
   username?: string;
@@ -15,6 +21,7 @@ export interface UserType {
   friends?: string[];
   newMsg?: number;
   lastMsg?: any;
+  info?: infoType;
 }
 export interface GroupType {
   _id?: string;
@@ -24,6 +31,7 @@ export interface GroupType {
   users?: string[];
   newMsg?: number;
   lastMsg?: any;
+  info?: infoType;
 }
 export interface MsgType {
   _id?: string;

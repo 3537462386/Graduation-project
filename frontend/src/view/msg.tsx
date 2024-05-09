@@ -16,8 +16,8 @@ import {
 import { HeaderBox } from '@/components/headerBox';
 import { FocusType, setNowFocus } from '@/store/modules/nowFocus';
 import { UserType, GroupType, MsgType } from '@/types';
-import { MehOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Button, Col, Input, Modal, Row } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Button, Col, Input, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import emoji from '@/utils/emoji.json';
@@ -237,7 +237,7 @@ export const Msg = () => {
           <div className="w-full h-30 box-border p-2 bg-[#e9e9e9]">
             <div className="w-full">
               <div className="relative">
-                <MehOutlined
+                <SmileOutlined
                   className={`text-[24px] ${emojiOpen ? 'text-[#0099ff]' : ''} `}
                   onClick={() => setEmojiOpen(!emojiOpen)}
                 />
