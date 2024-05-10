@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-11 17:04:44
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-09 17:59:25
+ * @LastEditTime: 2024-05-10 17:33:10
  * @Description: Description
  */
 import { getFriends, getFReq, dealReq, getGroups } from '@/api';
@@ -58,7 +58,9 @@ export const Contacts = () => {
   const [fReqList, setFReqList] = useState<FriendRequest[]>();
   const [actionStatus, setActionStatus] = useState('1');
   const userInfo = useSelector((state: any) => state.userSlice);
-  const onlineUser = useSelector((state: any) => state.commonSlice.onlineUser);
+  const onlineUser = useSelector(
+    (state: any) => state.onlineUserSlice.onlineUser
+  );
   const getFriendsList = async () => {
     const res = await getFriends({
       username: userInfo.username
@@ -99,6 +101,7 @@ export const Contacts = () => {
   // };
   useEffect(() => {
     // getAllChat();
+    // console.log(onlineUser);
     getFReqList();
     getFriendsList();
     getGroupList();
@@ -217,7 +220,9 @@ export const Contacts = () => {
                   <span className="text-sm">账号：{nowFocus?.username}</span>
                   <span>
                     状态：
-                    {onlineUser.has(nowFocus?._id) ? (
+                    {onlineUser.findIndex(
+                      (obj: any) => obj.userId === nowFocus?._id
+                    ) !== -1 ? (
                       <span>
                         <SmileFilled className="mr-1 text-green-600" />
                         在线

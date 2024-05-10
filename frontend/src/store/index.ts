@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-03-28 14:31:24
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-30 17:53:59
+ * @LastEditTime: 2024-05-10 16:41:19
  * @Description: Description
  */
 import {
@@ -13,6 +13,7 @@ import {
 } from '@reduxjs/toolkit';
 import commonSlice from './modules/common';
 import userSlice from './modules/user';
+import onlineUserSlice from './modules/onlineUser';
 import nowFocusSlice from './modules/nowFocus';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
@@ -29,13 +30,14 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['userSlice']
+  whitelist: ['userSlice', 'onlineUserSlice']
 };
 
 const reducer = combineReducers({
   commonSlice,
   userSlice,
-  nowFocusSlice
+  nowFocusSlice,
+  onlineUserSlice
 });
 
 // 创建持久化Reducer

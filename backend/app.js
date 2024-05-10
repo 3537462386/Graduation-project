@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-06 15:49:07
+ * @LastEditTime: 2024-05-10 16:32:06
  * @Description: Description
  */
 const Koa = require('koa')
@@ -17,8 +17,8 @@ const { Server } = require("socket.io");
 const app = new Koa()
 
 const server = require('http').Server(app);
-const onlineUser = new Set();
-
+// const onlineUser = new Set();
+const onlineUser = [];
 // 创建实时连接
 const socketIO = new Server(server, {
     cors: {
@@ -43,14 +43,28 @@ socketIO.on('connection', (socket) => {
     //加入房间
     if(data.length !== 0){
       socket.join(data);
-      onlineUser.add(data)
-      console.log(onlineUser);
+      onlineUser.push({
+        userId: data,
+        socketId: socket.id
+      })
+      console.log(onlineUser,'onlineUser');
     }
     socketIO.emit('onlineUser', onlineUser);
   });
 
   socket.on('disconnect', () => {
       // console.log('🔥: 一个用户已断开连接');
+      // onlineUser.forEach((obj) => {
+      //   if (obj.socketId === socket.id) {
+      //     onlineUser.delete(obj);
+      //   }
+      // });
+      const index = onlineUser.findIndex(obj => obj.socketId === socket.id);
+      if (index !== -1) {
+        onlineUser.splice(index, 1); // 删除指定索引位置的项
+      }
+      console.log(onlineUser);
+      socketIO.emit('onlineUser', onlineUser);
   });
 });
 

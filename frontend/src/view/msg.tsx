@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-08 15:27:00
+ * @LastEditTime: 2024-05-10 17:35:58
  * @Description: Description
  */
 import {
@@ -110,7 +110,9 @@ export const Msg = () => {
   const [msgListData, setMsgListData] = useState<MsgType[]>([]);
   const userInfo = useSelector((state: any) => state.userSlice);
   const nowFocus = useSelector((state: any) => state.nowFocusSlice);
-  const onlineUser = useSelector((state: any) => state.commonSlice.onlineUser);
+  const onlineUser = useSelector(
+    (state: any) => state.onlineUserSlice.onlineUser
+  );
   const [inputMsg, setInputMsg] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const { TextArea } = Input;
@@ -143,7 +145,10 @@ export const Msg = () => {
     setInputMsg('');
     getAllGroups();
     getFriendsList();
-    if (res.code === 1 && onlineUser.has(nowFocus?._id)) {
+    if (
+      res.code === 1 &&
+      onlineUser.findIndex((obj: any) => obj.userId === nowFocus?._id) !== -1
+    ) {
       // console.log('发送；');
       socket.emit('message', updatedMsgListData);
     }
@@ -167,9 +172,6 @@ export const Msg = () => {
   }, [socket]);
 
   useEffect(() => {
-    socket.on('connect', () => {
-      socket.emit('newJoin', userInfo.userId);
-    });
     getAllGroups();
     getFriendsList();
   }, []);

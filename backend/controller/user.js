@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-09 17:50:32
+ * @LastEditTime: 2024-05-10 16:06:25
  * @Description: Description
  */
 const User_col = require('../model/user')
@@ -79,7 +79,13 @@ const register = async (ctx, next) => {
 		let newUser = await User_col.create({
 			username: username,
 			password: password,
-			name: name
+			name: name,
+			info: {
+				sex: '',
+				age: '',
+				birthday: '',
+				sign: ''
+			}
 		})
 		if (newUser) {
 			const result = await Group_col.findByIdAndUpdate('662b733302bd84ce29d1756b', { $push: { users: newUser._id } })
@@ -139,7 +145,7 @@ const changeInfo = async (ctx, next) => {
 	try {
 		const result = await User_col.findByIdAndUpdate(userId, {
 			$set: {
-				userInfo:
+				info:
 				{
 					sex: info.sex,
 					age: age,

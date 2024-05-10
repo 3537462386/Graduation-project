@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-06 16:15:50
+ * @LastEditTime: 2024-05-10 15:51:30
  * @Description: Description
  */
 import { sendReq, getGroup, getUser, addGroup } from '@/api';
@@ -32,13 +32,16 @@ const MsgListItem = (props: MsgListItemPropsType) => {
       message.success('不能添加你自己');
       return;
     }
-    if (Object.values(item).includes('friends')) {
+    console.log(item);
+    if (Object.keys(item).includes('friends')) {
       const res = await sendReq({
         to: item._id,
         from: userInfo.userId
       });
       if (res.code === 1) {
         message.success('发送成功');
+      } else if (res.code === 2) {
+        message.error(res.msg);
       }
     } else {
       const res = await addGroup({
@@ -47,6 +50,8 @@ const MsgListItem = (props: MsgListItemPropsType) => {
       });
       if (res.code === 1) {
         message.success('添加成功');
+      } else if (res.code === 2) {
+        message.error(res.msg);
       }
     }
   };

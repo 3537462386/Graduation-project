@@ -2,10 +2,10 @@
  * @Author: L·W
  * @Date: 2024-03-29 14:40:48
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-09 16:57:50
+ * @LastEditTime: 2024-05-10 16:38:56
  * @Description: Description
  */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 export interface CommonState {
   /** 添加好友弹窗 */
@@ -14,15 +14,12 @@ export interface CommonState {
   createGroupVisible: boolean;
   /** 修改资料弹窗 */
   changeInfoVisible: boolean;
-  /** 在线用户 */
-  onlineUser: Set<string>;
 }
 
 const initialState = {
   addFriendVisible: false,
   createGroupVisible: false,
-  changeInfoVisible: true,
-  onlineUser: new Set<string>()
+  changeInfoVisible: false
 } as CommonState;
 
 const commonSlice = createSlice({
@@ -37,15 +34,11 @@ const commonSlice = createSlice({
     },
     setChangeInfoVisible: (state): void => {
       state.changeInfoVisible = !state.changeInfoVisible;
-    },
-    setOnlineUser: (state, action: PayloadAction<Set<string>>): void => {
-      state.onlineUser = action.payload;
     }
   }
 });
 export const {
   setAddFriendVisible,
-  setOnlineUser,
   setCreateGroupVisible,
   setChangeInfoVisible
 } = commonSlice.actions;

@@ -5,6 +5,7 @@ import {
   DatePicker,
   Form,
   FormProps,
+  GetProp,
   Input,
   Select,
   Upload,
@@ -15,31 +16,54 @@ import { CloseOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setChangeInfoVisible } from '@/store/modules/common';
 import { changeInfo } from '@/api';
+import { setUserInfo } from '@/store/modules/user';
+import dayjs from 'dayjs';
 type FieldType = {
   name?: string;
   sex?: string;
   birthday?: string;
   sign?: string;
 };
+type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 export const ChangeInfo = () => {
+  // const [initialValues, setInitialValues] = useState({});
   const [avatar, setAvatar] = useState('');
   const userInfo = useSelector((state: any) => state.userSlice);
   const dispatch = useDispatch();
+  const [form] = Form.useForm();
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+    if (!values.birthday) {
+      message.error('请选择生日');
+      return;
+    } else if (!values.sign) {
+      message.error('请输入个签');
+      return;
+    } else if (!values.sex) {
+      message.error('请选择性别');
+      return;
+    }
     const res = await changeInfo({
       info: {
-        name: values.name,
         sex: values.sex,
-        birthday: values.birthday,
+        birthday: dayjs(values.birthday),
         sign: values.sign
       },
-      name: userInfo.name,
-      avatar: userInfo.avatar,
+      name: values.name ?? userInfo.name,
+      avatar: avatar ?? userInfo.avatar,
       userId: userInfo.userId
     });
     if (res.code === 1) {
       message.success('修改成功');
-      //   dispatch(setCreateGroupVisible());
+      dispatch(
+        setUserInfo({
+          username: res.data?.username,
+          name: res.data?.name,
+          avatar: res.data?.avatar,
+          userId: res.data?._id,
+          info: res.data?.info
+        })
+      );
+      dispatch(setChangeInfoVisible());
     }
   };
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (
@@ -47,21 +71,37 @@ export const ChangeInfo = () => {
   ) => {
     console.log('Failed11:', errorInfo);
   };
+  const getBase64 = (img: FileType, callback: (url: string) => void) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result as string));
+    reader.readAsDataURL(img);
+  };
   const handleChange: UploadProps['onChange'] = (info) => {
-    // if (info.file.status === 'uploading') {
-    //   setLoading(true);
-    //   return;
-    // }
-    // if (info.file.status === 'done') {
-    //   // Get this url from response in real world.
-    //   getBase64(info.file.originFileObj as FileType, (url) => {
-    //     setLoading(false);
-    //     setImageUrl(url);
-    //   });
-    // }
+    // console.log(info, info.fileList, '111111111111');
+    getBase64(info.file.originFileObj as FileType, (url) => {
+      // setLoading(false);
+      setAvatar(url);
+      // console.log(url, 'url');
+    });
+  };
+  const initData = () => {
+    console.log(userInfo, 'userInfo');
+    setAvatar(userInfo.avatar);
+    // setInitialValues({
+    //   name: userInfo?.name,
+    //   sex: userInfo?.info?.sex ?? '男',
+    //   birthday: userInfo?.info?.birthday ?? '',
+    //   sign: userInfo?.info?.sign ?? ''
+    // });
+    form.setFieldsValue({
+      name: userInfo?.name,
+      sex: userInfo?.info?.sex ?? '男',
+      birthday: dayjs(userInfo?.info?.birthday) ?? '',
+      sign: userInfo?.info?.sign ?? ''
+    });
   };
   useEffect(() => {
-    // getFriendsList();
+    initData();
   }, []);
 
   return (
@@ -80,12 +120,12 @@ export const ChangeInfo = () => {
             name="avatar"
             className="w-22 h-22"
             showUploadList={false}
-            action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+            // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
             //   beforeUpload={beforeUpload}
             onChange={handleChange}
           >
             <img
-              src={userInfo.avatar}
+              src={avatar}
               alt="avatar"
               className="w-20 h-20 rounded-[50%] overflow-hidden"
             />
@@ -95,62 +135,35 @@ export const ChangeInfo = () => {
         <Form
           name="basic"
           style={{ maxWidth: 600 }}
-          initialValues={{ remember: true }}
+          form={form}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
-          <Form.Item<FieldType>
-            name="name"
-            label="昵称"
-            rules={[
-              {
-                required: true,
-                message: '昵称不能为空!'
-              }
-            ]}
-          >
+          <Form.Item<FieldType> name="name" label="昵称">
             <Input
               showCount
               maxLength={36}
-              defaultValue={userInfo?.name}
               className="w-full"
               placeholder="请输入你的昵称"
+              // defaultValue={userInfo.name}
             />
           </Form.Item>
 
-          <Form.Item<FieldType>
-            name="sign"
-            label="个签"
-            rules={[
-              {
-                required: true,
-                message: '个性签名不能为空!'
-              }
-            ]}
-          >
+          <Form.Item<FieldType> name="sign" label="个签">
             <Input
               className="w-full"
-              defaultValue={userInfo?.info?.sign ?? ''}
               showCount
               maxLength={80}
               placeholder="请输入你的个性签名!"
+              // defaultValue={userInfo.info?.sign ?? ''}
             />
           </Form.Item>
 
-          <Form.Item<FieldType>
-            name="sex"
-            label="性别"
-            rules={[
-              {
-                required: true,
-                message: '性别不能为空!'
-              }
-            ]}
-          >
+          <Form.Item<FieldType> name="sex" label="性别">
             <Select
-              defaultValue={userInfo?.info?.sex ?? '男'}
               className="w-full"
+              // defaultValue={userInfo.info?.sex ?? ''}
               options={[
                 { value: '男', label: '男' },
                 { value: '女', label: '女' }
@@ -158,19 +171,10 @@ export const ChangeInfo = () => {
             />
           </Form.Item>
 
-          <Form.Item<FieldType>
-            name="birthday"
-            label="生日"
-            rules={[
-              {
-                required: true,
-                message: '生日不能为空!'
-              }
-            ]}
-          >
+          <Form.Item<FieldType> name="birthday" label="生日">
             <DatePicker
-              defaultValue={userInfo?.info?.birthday ?? ''}
               className="w-full"
+              // defaultValue={userInfo.info?.birthday ?? ''}
             />
           </Form.Item>
           <Form.Item className="w-full flex justify-end">

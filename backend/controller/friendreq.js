@@ -7,6 +7,23 @@ const Msg_col = require('../model/message')
 const sendReq = async (ctx, next) => {
 	const { to, from } = ctx.request.body;
 	try {
+		const res = await Freq_col.findOne({
+			to,
+            from
+		})
+		if(res?.status === '0'){
+			ctx.body = {
+				code: 2,
+				msg: '你已经发送过申请了'
+			}
+			return;
+		}else if(res?.status === '1'){
+			ctx.body = {
+				code: 2,
+				msg: '对方已经同意了'
+			}
+			return;
+		}
 		const result = await Freq_col.create({
 			to,
             from

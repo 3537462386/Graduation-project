@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-25 17:09:37
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-09 14:44:53
+ * @LastEditTime: 2024-05-10 16:29:35
  * @Description: Description
  */
 const Group_col = require('../model/group')
@@ -31,7 +31,7 @@ const getAllChatGroup = async (ctx, next) => {
 	try {
 		const group_data = await Group_col.find({ users: { $in: [userId] } })
 		if (group_data) {
-			console.log(group_data);
+			// console.log(group_data);
 			for(let i = 0; i < group_data.length; i++) {
 				// const friend_data = await User_col.findOne({
 				// 	_id: user_data.friends[i]

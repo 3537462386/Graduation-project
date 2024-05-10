@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-03-18 13:38:07
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-08 16:27:24
+ * @LastEditTime: 2024-05-10 17:42:03
  * @Description: Description
  */
 import './App.css';
@@ -16,9 +16,13 @@ import { CreateGroup } from './components/createGroup';
 import { ChangeInfo } from './components/changeInfo';
 import io from 'socket.io-client';
 import { useEffect } from 'react';
-import { setOnlineUser } from './store/modules/common';
+import { setOnlineUser } from './store/modules/onlineUser';
 import { ConfigProvider } from 'antd';
-import zhCN from 'antd/lib/locale/zh_CN';
+import locale from 'antd/lib/locale/zh_CN';
+import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
+
+dayjs.locale('zh-cn');
 // import { ActionDiv } from './components/actionDiv.tsx';
 function App() {
   const socket = io('http://localhost:4000');
@@ -40,7 +44,7 @@ function App() {
   }, [socket]);
   return (
     <>
-      <ConfigProvider locale={zhCN}>
+      <ConfigProvider locale={locale}>
         <div className="w-default-width h-default-height bg-white absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 border border-solid border-[#e9e9e9] shadow-lg">
           <RouterProvider router={router} />
         </div>

@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-03-28 15:02:08
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-05 14:55:58
+ * @LastEditTime: 2024-05-10 16:36:32
  * @Description: Description
  */
 import { useState } from 'react';
@@ -21,6 +21,7 @@ import { UserOutlined } from '@ant-design/icons';
 import useHook from '@/hooks/useHook';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '@/store/modules/user';
+import io from 'socket.io-client';
 type FieldType = {
   username?: string;
   password?: string;
@@ -31,6 +32,7 @@ export const Login = () => {
   const { routerPush } = useHook();
   const [isLogin, setIsLogin] = useState(true);
   const [avatar, setAvatar] = useState('');
+  const socket = io('http://localhost:4000');
   const dispatch = useDispatch();
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     if (isLogin) {
@@ -49,6 +51,7 @@ export const Login = () => {
           })
         );
         message.success('登录成功');
+        socket.emit('newJoin', res.data?._id);
         routerPush('/home/msg');
       }
     } else {
