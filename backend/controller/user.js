@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-23 10:41:27
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-10 16:06:25
+ * @LastEditTime: 2024-05-11 17:25:16
  * @Description: Description
  */
 const User_col = require('../model/user')
@@ -196,6 +196,28 @@ const getUser = async (ctx, next) => {
 	}
 }
 
+// 查询用户
+const deleteFriend = async (ctx, next) => {
+	const { userId, friendId } = ctx.request.body;
+	// 查表
+	try {
+		const result = await User_col.updateOne({ _id: userId },{ $pull: { friends: friendId }})
+		if (result) {
+			ctx.body = {
+				code: 1,
+				msg: '删除成功',
+				data: result
+			}
+			return;
+		}
+	} catch (err) {
+		ctx.body = {
+			code: -1,
+			msg: '用户名不存在'
+		}
+		return;
+	}
+}
 
 // 查询好友
 const getFriendsStatus = async (ctx, next) => {
@@ -344,5 +366,6 @@ module.exports = {
 	getUser,
 	getFriends,
 	getFriendsStatus,
-	changeInfo
+	changeInfo,
+	deleteFriend
 }

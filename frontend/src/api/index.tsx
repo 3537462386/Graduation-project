@@ -37,6 +37,9 @@ export const getFriendsStatus = async (data: any): Promise<resState> => {
 export const changeInfo = async (data: any): Promise<resState> => {
   return request.post('/user/changeInfo', data);
 };
+export const deleteFriend = async (data: any): Promise<resState> => {
+  return request.post('/user/deleteFriend', data);
+};
 
 export const getAllGroup = async (data: any): Promise<resState> => {
   return request.post('/group/getAllChatGroup', data);

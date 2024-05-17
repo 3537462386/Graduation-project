@@ -85,7 +85,7 @@ export const ChangeInfo = () => {
     });
   };
   const initData = () => {
-    console.log(userInfo, 'userInfo');
+    // console.log(userInfo, 'userInfo');
     setAvatar(userInfo.avatar);
     // setInitialValues({
     //   name: userInfo?.name,

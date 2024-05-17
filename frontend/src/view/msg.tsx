@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-10 17:35:58
+ * @LastEditTime: 2024-05-11 17:05:01
  * @Description: Description
  */
 import {
@@ -11,17 +11,29 @@ import {
   newMsg,
   getMsg,
   getAllGroup,
-  getGroupMsg
+  getGroupMsg,
+  deleteFriend
 } from '@/api';
 import { HeaderBox } from '@/components/headerBox';
 import { FocusType, setNowFocus } from '@/store/modules/nowFocus';
 import { UserType, GroupType, MsgType } from '@/types';
 import { SmileOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Button, Col, Input, Row } from 'antd';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Col,
+  Drawer,
+  Input,
+  Modal,
+  Row,
+  message
+} from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import emoji from '@/utils/emoji.json';
 import io from 'socket.io-client';
+import type { DrawerStyles } from 'antd/es/drawer/DrawerPanel';
 interface MsgListItemPropsType {
   item?: UserType | GroupType;
   setNowFocus?: any;
@@ -110,6 +122,9 @@ export const Msg = () => {
   const [msgListData, setMsgListData] = useState<MsgType[]>([]);
   const userInfo = useSelector((state: any) => state.userSlice);
   const nowFocus = useSelector((state: any) => state.nowFocusSlice);
+  const [showDeleteFriend, setShowDeleteFriend] = useState(false);
+  const [showDeleteMsg, setShowDeleteMsg] = useState(false);
+  const [showUserControls, setShowUserControls] = useState(false);
   const onlineUser = useSelector(
     (state: any) => state.onlineUserSlice.onlineUser
   );
@@ -120,6 +135,11 @@ export const Msg = () => {
     .split(',')
     .map((emoji, index) => ({ id: 123 + index, emoji }));
 
+  const drawerStyles: DrawerStyles = {
+    body: {
+      background: '#f2f2f2'
+    }
+  };
   const getFriendsList = async () => {
     const { data: friendData } = await getFriendsStatus({
       username: userInfo.username
@@ -153,7 +173,26 @@ export const Msg = () => {
       socket.emit('message', updatedMsgListData);
     }
   };
+  const handleDeleteFriend = async () => {
+    const res = await deleteFriend({
+      userId: userInfo.userId,
+      friendId: nowFocus?._id
+    });
+    if (res.code === 1) {
+      message.success('删除好友成功');
+    }
+    setShowDeleteFriend(false);
+  };
+  const deleteMsg = () => {
+    setShowDeleteMsg(false);
+  };
+  const showDrawer = () => {
+    setShowUserControls(!showUserControls);
+  };
 
+  const onClose = () => {
+    setShowUserControls(false);
+  };
   useEffect(() => {
     // 监听接收到消息事件
     socket.on('message', async (data) => {
@@ -177,8 +216,8 @@ export const Msg = () => {
   }, []);
   return (
     <div className="h-full flex-1 flex flex-col">
-      <HeaderBox name={nowFocus?.name} />
-      <div className="flex-1 w-full flex">
+      <HeaderBox name={nowFocus?.name} showDrawer={showDrawer} />
+      <div className="flex-1 w-full flex relative overflow-hidden">
         <div className="w-70 h-full overflow-hidden select-none">
           {groupListData?.map((item, index) => (
             <MsgListItem
@@ -212,13 +251,14 @@ export const Msg = () => {
                         ? item?.from?.avatar
                         : item?.to?.avatar
                     }
+                    className="mr-2"
                     size={45}
                   />
                 ) : (
                   ''
                 )}
                 <div
-                  className={`flex flex-col ${item?.from?.username !== userInfo.username ? 'items-start' : 'items-end'}`}
+                  className={`h-full flex flex-col justify-center ${item?.from?.username !== userInfo.username ? 'items-start' : 'items-end'}`}
                 >
                   {nowFocus?.isGroupMsg ? <div>{item?.from?.name}</div> : ''}
                   <div
@@ -231,7 +271,7 @@ export const Msg = () => {
                 {item?.from?.username !== userInfo.username ? (
                   ''
                 ) : (
-                  <Avatar src={item?.from?.avatar} size={45} />
+                  <Avatar src={item?.from?.avatar} size={45} className="ml-2" />
                 )}
               </div>
             ))}
@@ -289,7 +329,50 @@ export const Msg = () => {
             </div>
           </div>
         </div>
+        <Drawer
+          // title="Basic Drawer"
+          placement="right"
+          closable={false}
+          onClose={onClose}
+          open={showUserControls}
+          getContainer={false}
+          width={300}
+          styles={drawerStyles}
+        >
+          <div
+            className="w-full h-10 px-4 mb-5 text-base rounded-md bg-white flex items-center select-none"
+            onClick={() => setShowDeleteMsg(true)}
+          >
+            删除聊天记录
+          </div>
+          <div
+            onClick={() => setShowDeleteFriend(true)}
+            className="w-full h-10 px-4 text-base text-red-700 rounded-md bg-white flex items-center justify-center select-none"
+          >
+            删除好友
+          </div>
+        </Drawer>
       </div>
+      <Modal
+        open={showDeleteFriend}
+        onOk={handleDeleteFriend}
+        onCancel={() => setShowDeleteFriend(false)}
+        width={350}
+        // style={{ top: '45%' }}
+        centered
+      >
+        <p>确认后将删除该好友</p>
+      </Modal>
+      <Modal
+        open={showDeleteMsg}
+        onOk={deleteMsg}
+        onCancel={() => setShowDeleteMsg(false)}
+        width={350}
+        // style={{ top: '45%' }}
+        centered
+      >
+        <p>确认后将删除所有聊天记录</p>
+      </Modal>
     </div>
   );
 };

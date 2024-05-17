@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  * @Author: L·W
  * @Date: 2024-04-11 13:58:14
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-08 17:26:25
+ * @LastEditTime: 2024-05-11 16:30:45
  * @Description: Description
  */
 import { Button, Dropdown, Input } from 'antd';
@@ -11,7 +12,8 @@ import {
   PlusOutlined,
   CloseOutlined,
   MinusOutlined,
-  BorderOutlined
+  BorderOutlined,
+  EllipsisOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useDispatch } from 'react-redux';
@@ -22,9 +24,10 @@ import {
 import { useLocation } from 'react-router-dom';
 interface PropsType {
   name?: string;
+  showDrawer?: any;
 }
 export const HeaderBox = (props: PropsType) => {
-  const { name } = props;
+  const { name, showDrawer } = props;
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -49,7 +52,7 @@ export const HeaderBox = (props: PropsType) => {
     }
   ];
   const onClick: MenuProps['onClick'] = ({ key }) => {
-    console.log('click', key);
+    // console.log('click', key);
     if (key === '1') {
       dispatch(setCreateGroupVisible());
     } else {
@@ -87,8 +90,13 @@ export const HeaderBox = (props: PropsType) => {
             <CloseOutlined />
           </div>
         </div>
-        <div className="w-full flex-1 flex justify-center">
+        <div className="w-full flex-1 flex justify-between items-center px-3">
+          <span></span>
           <div className="text-2xl">{name}</div>
+          <EllipsisOutlined
+            className="text-[30px] hover:text-blue-500"
+            onClick={showDrawer}
+          />
         </div>
       </div>
     </div>

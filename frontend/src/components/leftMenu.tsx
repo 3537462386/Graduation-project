@@ -3,14 +3,21 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-30 18:10:27
+ * @LastEditTime: 2024-05-11 15:22:26
  * @Description: Description
  */
 // import { CommonState } from '@/store/modules/common';
 import useHook from '@/hooks/useHook';
-import { Avatar } from 'antd';
+import { setChangeInfoVisible } from '@/store/modules/common';
+import {
+  MenuOutlined,
+  PoweroffOutlined,
+  SolutionOutlined
+} from '@ant-design/icons';
+import { Avatar, Dropdown } from 'antd';
+import type { MenuProps } from 'antd';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 interface PropsType {
   icon: string;
@@ -43,6 +50,36 @@ const MenuItem = (props: PropsType) => {
 };
 export const LeftMenu = () => {
   const userInfo = useSelector((state: any) => state.userSlice);
+  const dispatch = useDispatch();
+  const { routerPush } = useHook();
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <div>
+          <SolutionOutlined />
+          <span>编辑资料</span>
+        </div>
+      )
+    },
+    {
+      key: '2',
+      label: (
+        <div>
+          <PoweroffOutlined />
+          <span>退出登录</span>
+        </div>
+      )
+    }
+  ];
+  const onClick: MenuProps['onClick'] = ({ key }) => {
+    console.log('click', key);
+    if (key === '1') {
+      dispatch(setChangeInfoVisible());
+    } else {
+      routerPush('/login');
+    }
+  };
   return (
     <div className="h-full w-15 py-5 flex flex-col justify-between box-border bg-[#f2f2f2]">
       <div className="w-full flex flex-col items-center justify-center">
@@ -54,7 +91,13 @@ export const LeftMenu = () => {
         />
       </div>
       <div className="w-full flex flex-col items-center justify-center">
-        <MenuItem url={'/home/msg'} icon={'/static/leftMenu/more.svg'} />
+        <Dropdown
+          menu={{ items, onClick }}
+          trigger={['click']}
+          placement="topRight"
+        >
+          <MenuOutlined className="text-[25px] hover:text-blue-500" />
+        </Dropdown>
       </div>
     </div>
   );

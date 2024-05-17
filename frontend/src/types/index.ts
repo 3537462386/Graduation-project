@@ -19,6 +19,7 @@ export interface UserType {
   name?: string;
   avatar?: string;
   friends?: string[];
+  users?: string[];
   newMsg?: number;
   lastMsg?: any;
   info?: infoType;

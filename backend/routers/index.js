@@ -25,6 +25,9 @@ router.post('/user/getFriends', user_controller.getFriends)
 router.post('/user/getFriendsStatus', user_controller.getFriendsStatus)
 // 修改资料
 router.post('/user/changeInfo', user_controller.changeInfo)
+// 删除好友
+router.post('/user/deleteFriend', user_controller.deleteFriend)
+
 /* group. */
 // 获取所有群组
 router.post('/group/getAllGroup', group_controller.getAllGroup)
