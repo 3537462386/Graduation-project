@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-03-28 14:30:22
  * @LastEditors: L·W
- * @LastEditTime: 2024-04-26 14:03:22
+ * @LastEditTime: 2024-05-18 14:44:09
  * @Description: Description
  */
 import { Home } from '@/layout/home';
@@ -60,6 +60,19 @@ const router = createBrowserRouter([
                 async lazy() {
                   const { Contacts } = await import('@/view/contacts');
                   return { Component: Contacts };
+                }
+              }
+            ]
+          },
+          {
+            path: 'texts',
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                async lazy() {
+                  const { Texts } = await import('@/view/texts');
+                  return { Component: Texts };
                 }
               }
             ]

@@ -2,7 +2,7 @@
  * @Author: L·W
  * @Date: 2024-04-25 17:09:37
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-09 16:29:38
+ * @LastEditTime: 2024-05-22 14:52:37
  * @Description: Description
  */
 const router = require('koa-router')();
@@ -10,6 +10,7 @@ const user_controller=require('../controller/user')
 const group_controller=require('../controller/group')
 const msg_controller=require('../controller/message')
 const freq_controller=require('../controller/friendreq')
+const text_controller=require('../controller/text')
 /* user. */
 // 登录
 router.post('/user/login', user_controller.login)
@@ -58,4 +59,16 @@ router.post('/friendReq/sendReq', freq_controller.sendReq)
 router.post('/friendReq/getFReq', freq_controller.getFReq)
 // 处理好友申请
 router.post('/friendReq/dealReq', freq_controller.dealReq)
+
+/* text. */
+// 发表说说
+router.post('/text/createText', text_controller.createText)
+// 查询说说
+router.post('/text/getText', text_controller.getText)
+// 添加评论
+router.post('/text/addComment', text_controller.addComment)
+// 点赞文章
+router.post('/text/likeText', text_controller.likeText)
+// 取消点赞文章
+router.post('/text/unLikeText', text_controller.unLikeText)
 module.exports = router

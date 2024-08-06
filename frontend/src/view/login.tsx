@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-03-28 15:02:08
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-10 16:36:32
+ * @LastEditTime: 2024-05-30 16:04:54
  * @Description: Description
  */
 import { useState } from 'react';
@@ -21,7 +21,6 @@ import { UserOutlined } from '@ant-design/icons';
 import useHook from '@/hooks/useHook';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '@/store/modules/user';
-import io from 'socket.io-client';
 type FieldType = {
   username?: string;
   password?: string;
@@ -32,7 +31,6 @@ export const Login = () => {
   const { routerPush } = useHook();
   const [isLogin, setIsLogin] = useState(true);
   const [avatar, setAvatar] = useState('');
-  const socket = io('http://localhost:4000');
   const dispatch = useDispatch();
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     if (isLogin) {
@@ -51,7 +49,6 @@ export const Login = () => {
           })
         );
         message.success('登录成功');
-        socket.emit('newJoin', res.data?._id);
         routerPush('/home/msg');
       }
     } else {
@@ -81,13 +78,13 @@ export const Login = () => {
     console.log('Failed11:', errorInfo);
   };
   return (
-    <div className="w-full h-full overflow-hidden relative bg-[url('/static/login/bg1.jpg')] bg-cover bg-no-repeat">
+    <div className="w-full h-full overflow-hidden relative bg-[url('/static/login/bg.jpg')] bg-cover bg-no-repeat">
       {/*切换功能区 */}
       <div
-        className={`h-full absolute w-[40%] flexCenter bg-yellow-200 z-99 left-0 overflow-hidden transition-transform duration-1000 ease-in-out ${!isLogin ? '' : 'transform translate-x-[calc(1080px-100%)]'}`}
+        className={`h-full absolute w-[40%] m-0 p-0 flexCenter z-99 left-0 overflow-hidden transition-transform duration-1000 ease-in-out ${!isLogin ? '' : 'transform translate-x-[calc(1080px-100%)]'}`}
       >
         <div
-          className="w-24 h-10 bg-indigo-500 rounded-xl flexCenter cursor-pointer flex-wrap overflow-hidden"
+          className="w-24 h-10 bg-[#1677ff] rounded-xl flexCenter cursor-pointer flex-wrap overflow-hidden"
           onClick={() => setIsLogin(!isLogin)}
         >
           <div
@@ -104,9 +101,9 @@ export const Login = () => {
       </div>
       {/* 表单区域 */}
       <div
-        className={`overflow-hidden absolute z-9 w-[60%] left-[40%] h-full transition-all duration-1000 ease-in-out ${!isLogin ? '' : 'transform translate-x-[calc(-1080px+100%)]'}`}
+        className={`overflow-hidden backdrop-blur-lg m-0 p-0 absolute z-9 w-[60%] left-[40%] h-full transition-all duration-1000 ease-in-out ${!isLogin ? '' : 'transform translate-x-[calc(-1080px+100%)]'}`}
       >
-        <div className="flexCenter w-full h-full bg-gray-600">
+        <div className="flexCenter w-full h-full">
           {isLogin ? (
             <div className="signInBox flex flex-col items-center justify-center">
               <Avatar
@@ -161,7 +158,7 @@ export const Login = () => {
                   </Form.Item>
 
                   <Form.Item<FieldType> name="remember" valuePropName="checked">
-                    <Checkbox>Remember me</Checkbox>
+                    <Checkbox>记住我</Checkbox>
                   </Form.Item>
 
                   <Form.Item>
@@ -226,13 +223,12 @@ export const Login = () => {
                   >
                     <Input.Password className="w-full" placeholder="密码" />
                   </Form.Item>
-
-                  <Form.Item<FieldType> name="remember" valuePropName="checked">
-                    <Checkbox>Remember me</Checkbox>
-                  </Form.Item>
-
                   <Form.Item>
-                    <Button type="primary" htmlType="submit" className="w-full">
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      className="w-full mt-4"
+                    >
                       立即注册
                     </Button>
                   </Form.Item>

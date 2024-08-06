@@ -123,23 +123,25 @@ export const AddFriend = () => {
     }
   ];
   return (
-    <div className="h-125 w-125 p-5 bg-white border border-solid border-[#e9e9e9] shadow-lg absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10">
-      <div className="flex items-center justify-between mb-4">
-        <span></span>
-        <p>添加好友</p>
-        <Button
-          icon={<CloseOutlined />}
-          onClick={() => dispatch(setAddFriendVisible())}
-        ></Button>
-      </div>
+    <div className="w-100vw h-screen backdrop-blur-sm z-2">
+      <div className="h-125 w-125 p-5 bg-white border border-solid border-[#e9e9e9] shadow-lg absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10">
+        <div className="flex items-center justify-between mb-4">
+          <span></span>
+          <p>添加好友</p>
+          <Button
+            icon={<CloseOutlined />}
+            onClick={() => dispatch(setAddFriendVisible())}
+          ></Button>
+        </div>
 
-      <Input
-        placeholder="输入搜索关键词"
-        prefix={<SearchOutlined />}
-        className="w-full"
-        onChange={(e) => debouncedSearch(e.target.value)}
-      />
-      <Tabs defaultActiveKey="1" items={items} />
+        <Input
+          placeholder="输入搜索关键词"
+          prefix={<SearchOutlined />}
+          className="w-full"
+          onChange={(e) => debouncedSearch(e.target.value)}
+        />
+        <Tabs defaultActiveKey="1" items={items} />
+      </div>
     </div>
   );
 };

@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-12 15:50:19
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-07 15:28:40
+ * @LastEditTime: 2024-05-20 16:59:30
  * @Description: Description
  */
 import { request } from '@/utils/axios';
@@ -75,4 +75,20 @@ export const getFReq = async (data: any): Promise<resState> => {
 };
 export const dealReq = async (data: any): Promise<resState> => {
   return request.post('/friendReq/dealReq', data);
+};
+
+export const createText = async (data: any): Promise<resState> => {
+  return request.post('/text/createText', data);
+};
+export const getText = async (data: any): Promise<resState> => {
+  return request.post('/text/getText', data);
+};
+export const addComment = async (data: any): Promise<resState> => {
+  return request.post('/text/addComment', data);
+};
+export const likeText = async (data: any): Promise<resState> => {
+  return request.post('/text/likeText', data);
+};
+export const unLikeText = async (data: any): Promise<resState> => {
+  return request.post('/text/unLikeText', data);
 };

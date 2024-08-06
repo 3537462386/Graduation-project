@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-11 17:04:44
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-11 14:59:22
+ * @LastEditTime: 2024-05-20 15:49:51
  * @Description: Description
  */
 import { getFriends, getFReq, dealReq, getGroups } from '@/api';
@@ -22,7 +22,8 @@ import { Avatar, Button, Divider, Segmented } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setNowFocus } from '@/store/modules/nowFocus';
-import useHook from '@/hooks/useHook';
+import useHook, { timeFormatting } from '@/hooks/useHook';
+import { EmptyData } from '@/components/emptyData';
 interface ContactItemPropsType {
   item?: UserType | GroupType;
   setNowFocu?: any;
@@ -190,10 +191,13 @@ export const Contacts = () => {
                     </div>
                     <div className="mr-2">
                       {item?.from?.username === userInfo.username
-                        ? '正在验证你的邀请'
+                        ? '正在验证你的申请'
                         : '请求加为好友'}
                     </div>
-                    <div className="text-[#999999]"> {item?.timestamp}</div>
+                    <div className="text-[#999999]">
+                      {' '}
+                      {timeFormatting(item?.timestamp as string, 1)}
+                    </div>
                   </div>
                 </div>
                 {item?.from?.username === userInfo.username &&
@@ -272,8 +276,13 @@ export const Contacts = () => {
                       <span>{`群成员(${nowFocus?.users?.length}人)`}</span>
                     </div>
                     <div className="overflow-hidden">
-                      {nowFocus?.users?.map((item: any) => (
-                        <Avatar src={item.avatar} size={32} className="mr-2" />
+                      {nowFocus?.users?.map((item: any, index) => (
+                        <Avatar
+                          src={item.avatar}
+                          size={32}
+                          className="mr-2"
+                          key={index}
+                        />
                       ))}
                     </div>
                   </div>
@@ -324,7 +333,9 @@ export const Contacts = () => {
             </div>
           </div>
         ) : (
-          'no data'
+          <div className="h-full flex-1">
+            <EmptyData />
+          </div>
         )}
       </div>
     </div>

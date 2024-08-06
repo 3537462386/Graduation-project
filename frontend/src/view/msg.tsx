@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-11 17:05:01
+ * @LastEditTime: 2024-05-30 21:29:24
  * @Description: Description
  */
 import {
@@ -15,7 +15,7 @@ import {
   deleteFriend
 } from '@/api';
 import { HeaderBox } from '@/components/headerBox';
-import { FocusType, setNowFocus } from '@/store/modules/nowFocus';
+import { FocusType } from '@/store/modules/nowFocus';
 import { UserType, GroupType, MsgType } from '@/types';
 import { SmileOutlined } from '@ant-design/icons';
 import {
@@ -30,10 +30,12 @@ import {
   message
 } from 'antd';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import emoji from '@/utils/emoji.json';
 import io from 'socket.io-client';
 import type { DrawerStyles } from 'antd/es/drawer/DrawerPanel';
+import { EmptyData } from '@/components/emptyData';
+import { throttle } from 'lodash';
 interface MsgListItemPropsType {
   item?: UserType | GroupType;
   setNowFocus?: any;
@@ -53,19 +55,25 @@ interface MsgListItemPropsType {
 //    )
 // }
 const MsgListItem = (props: MsgListItemPropsType) => {
-  const { item, setMsgListData, getFriendsList, isGroupMsg } = props;
+  const {
+    item,
+    setMsgListData,
+    getFriendsList,
+    isGroupMsg,
+    setNowFocus,
+    nowFocus
+  } = props;
   const userInfo = useSelector((state: any) => state.userSlice);
-  const nowFocus = useSelector((state: any) => state.nowFocusSlice);
-  const dispatch = useDispatch();
+  // const nowFocus = useSelector((state: any) => state.nowFocusSlice);
+  // const dispatch = useDispatch();
   const changeAction = async () => {
-    dispatch(
-      setNowFocus({
-        _id: item?._id,
-        username: item?.username,
-        name: item?.name,
-        isGroupMsg: isGroupMsg
-      })
-    );
+    setNowFocus({
+      _id: item?._id,
+      username: item?.username,
+      name: item?.name,
+      isGroupMsg: isGroupMsg
+    });
+    // console.log(nowFocus);
     if (!isGroupMsg) {
       const res = await getMsg({
         from: userInfo.userId,
@@ -117,11 +125,11 @@ const MsgListItem = (props: MsgListItemPropsType) => {
 export const Msg = () => {
   const socket = io('http://localhost:4000');
   const [groupListData, setGroupListData] = useState<GroupType[]>([]);
-  // const [nowFocus, setNowFocus] = useState<UserType | GroupType>();
+  const [nowFocus, setNowFocus] = useState<FocusType>();
   const [friendListData, setFriendListData] = useState<UserType[]>([]);
   const [msgListData, setMsgListData] = useState<MsgType[]>([]);
   const userInfo = useSelector((state: any) => state.userSlice);
-  const nowFocus = useSelector((state: any) => state.nowFocusSlice);
+  // const nowFocus = useSelector((state: any) => state.nowFocusSlice);
   const [showDeleteFriend, setShowDeleteFriend] = useState(false);
   const [showDeleteMsg, setShowDeleteMsg] = useState(false);
   const [showUserControls, setShowUserControls] = useState(false);
@@ -140,12 +148,13 @@ export const Msg = () => {
       background: '#f2f2f2'
     }
   };
-  const getFriendsList = async () => {
+  const getFriendsListAAA = async () => {
     const { data: friendData } = await getFriendsStatus({
       username: userInfo.username
     });
     setFriendListData(friendData);
   };
+  const getFriendsList = throttle(getFriendsListAAA, 800);
   const getAllGroups = async () => {
     const res = await getAllGroup({
       userId: userInfo.userId
@@ -169,8 +178,12 @@ export const Msg = () => {
       res.code === 1 &&
       onlineUser.findIndex((obj: any) => obj.userId === nowFocus?._id) !== -1
     ) {
-      // console.log('发送；');
-      socket.emit('message', updatedMsgListData);
+      console.log('发送；');
+      socket.emit('send_msg', {
+        from: userInfo.userId,
+        to: nowFocus?._id,
+        isGroupMsg: nowFocus?.isGroupMsg
+      });
     }
   };
   const handleDeleteFriend = async () => {
@@ -183,40 +196,62 @@ export const Msg = () => {
     }
     setShowDeleteFriend(false);
   };
-  const deleteMsg = () => {
-    setShowDeleteMsg(false);
-  };
-  const showDrawer = () => {
-    setShowUserControls(!showUserControls);
-  };
-
-  const onClose = () => {
-    setShowUserControls(false);
-  };
-  useEffect(() => {
-    // 监听接收到消息事件
-    socket.on('message', async (data) => {
-      // const updatedMsgListData = [...msgListData, data];
-      // setMsgListData(data);
-      // console.log('yes');
-      // console.log(nowFocus?._id, userInfo.userId);
-      if (
-        data[0].from._id === nowFocus?._id &&
-        data[0].to._id === userInfo.userId
-      ) {
-        setMsgListData(data);
-      }
+  const getNowMsgAAA = async () => {
+    if (!nowFocus?._id) return;
+    if (!nowFocus?.isGroupMsg) {
+      const res = await getMsg({
+        from: userInfo.userId,
+        to: nowFocus?._id
+      });
+      setMsgListData(res.data);
       getFriendsList();
-    });
-  }, [socket]);
-
+    } else {
+      const res = await getGroupMsg({
+        groupId: nowFocus?._id
+      });
+      setMsgListData(res.data);
+      // getAllGroups()
+    }
+  };
+  const getNowMsg = throttle(getNowMsgAAA, 800);
   useEffect(() => {
     getAllGroups();
     getFriendsList();
+    getNowMsg();
   }, []);
+
+  useEffect(() => {
+    // 监听接收到消息事件
+    socket.on('receive_msg', async (data) => {
+      // const updatedMsgListData = [...msgListData, data];
+      // setMsgListData(data);
+      // console.log(data, '11111111');
+      if (data.to === userInfo.userId) {
+        getFriendsList();
+        if (nowFocus?._id === data.from) {
+          const res = await getMsg({
+            from: data.from,
+            to: data.to
+          });
+          setMsgListData(res.data);
+        }
+      } else if (data.isGroupMsg) {
+        getFriendsList();
+        if (nowFocus?._id === data.to) {
+          const res = await getGroupMsg({
+            groupId: data.to
+          });
+          setMsgListData(res.data);
+        }
+      }
+    });
+  }, [socket]);
   return (
     <div className="h-full flex-1 flex flex-col">
-      <HeaderBox name={nowFocus?.name} showDrawer={showDrawer} />
+      <HeaderBox
+        name={nowFocus?.name}
+        showDrawer={() => setShowUserControls(!showUserControls)}
+      />
       <div className="flex-1 w-full flex relative overflow-hidden">
         <div className="w-70 h-full overflow-hidden select-none">
           {groupListData?.map((item, index) => (
@@ -225,6 +260,8 @@ export const Msg = () => {
               item={item}
               isGroupMsg={true}
               setMsgListData={setMsgListData}
+              setNowFocus={setNowFocus}
+              nowFocus={nowFocus}
             />
           ))}
           {friendListData?.map((item, index) => (
@@ -234,106 +271,120 @@ export const Msg = () => {
               isGroupMsg={false}
               setMsgListData={setMsgListData}
               getFriendsList={getFriendsList}
+              setNowFocus={setNowFocus}
+              nowFocus={nowFocus}
             />
           ))}
         </div>
-        <div className="h-full flex-1 flex flex-col">
-          <div className="h-[318px] w-full flex flex-col-reverse bg-[#f2f2f2] px-6 overflow-scroll overflow-x-hidden">
-            {msgListData?.map((item, index) => (
-              <div
-                className={`w-full my-2 flex items-start ${item?.from?.username !== userInfo.username ? 'justify-start' : 'justify-end'}`}
-                key={index}
-              >
-                {item?.from?.username !== userInfo.username ? (
-                  <Avatar
-                    src={
-                      nowFocus?.isGroupMsg
-                        ? item?.from?.avatar
-                        : item?.to?.avatar
-                    }
-                    className="mr-2"
-                    size={45}
-                  />
-                ) : (
-                  ''
-                )}
+        {nowFocus?._id ? (
+          <div className="h-full flex-1 flex flex-col">
+            <div className="h-[318px] w-full flex flex-col-reverse bg-[#f2f2f2] px-6 overflow-scroll overflow-x-hidden">
+              {msgListData?.map((item, index) => (
                 <div
-                  className={`h-full flex flex-col justify-center ${item?.from?.username !== userInfo.username ? 'items-start' : 'items-end'}`}
+                  className={`w-full my-2 flex items-start ${item?.from?.username !== userInfo.username ? 'justify-start' : 'justify-end'}`}
+                  key={index}
                 >
-                  {nowFocus?.isGroupMsg ? <div>{item?.from?.name}</div> : ''}
+                  {item?.from?.username !== userInfo.username ? (
+                    <Avatar
+                      src={
+                        nowFocus?.isGroupMsg
+                          ? item?.from?.avatar
+                          : item?.from?.avatar
+                      }
+                      className="mr-2"
+                      size={45}
+                    />
+                  ) : (
+                    ''
+                  )}
                   <div
-                    className={`min-h-10 flexCenter max-w-125 px-4 rounded-md ${item?.from?.username !== userInfo.username ? 'bg-white' : 'bg-[#0099ff]'} ${item?.from?.username !== userInfo.username ? '' : 'text-white'} `}
+                    className={`h-full flex flex-col justify-center ${item?.from?.username !== userInfo.username ? 'items-start' : 'items-end'}`}
                   >
-                    {item?.content}
-                  </div>
-                </div>
-
-                {item?.from?.username !== userInfo.username ? (
-                  ''
-                ) : (
-                  <Avatar src={item?.from?.avatar} size={45} className="ml-2" />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="w-full h-30 box-border p-2 bg-[#e9e9e9]">
-            <div className="w-full">
-              <div className="relative">
-                <SmileOutlined
-                  className={`text-[24px] ${emojiOpen ? 'text-[#0099ff]' : ''} `}
-                  onClick={() => setEmojiOpen(!emojiOpen)}
-                />
-                {emojiOpen ? (
-                  <div className="absolute flexCenter bottom-9 w-50 h-50 bg-white rounded-md border border-solid border-[#e9e9e9] shadow-lg">
-                    <Row
-                      // gutter={8}
-                      className="w-45 h-45 overflow-scroll overflow-x-hidden"
+                    {nowFocus?.isGroupMsg ? <div>{item?.from?.name}</div> : ''}
+                    <div
+                      className={`min-h-10 flexCenter max-w-125 px-4 rounded-md ${item?.from?.username !== userInfo.username ? 'bg-white' : 'bg-[#0099ff]'} ${item?.from?.username !== userInfo.username ? '' : 'text-white'} `}
                     >
-                      {emojiArray.map((item) => {
-                        return (
-                          <Col span={4} key={item.id}>
-                            <div
-                              className="text-[20px] w-7 h-7 select-none flexCenter mb-2 rounded-md cursor-pointer hover:bg-[#eeeded]"
-                              onClick={() => setInputMsg(inputMsg + item.emoji)}
-                            >
-                              {item.emoji}
-                            </div>
-                          </Col>
-                        );
-                      })}
-                    </Row>
+                      {item?.content}
+                    </div>
                   </div>
-                ) : (
-                  ''
-                )}
-              </div>
-              <div></div>
+
+                  {item?.from?.username !== userInfo.username ? (
+                    ''
+                  ) : (
+                    <Avatar
+                      src={item?.from?.avatar}
+                      size={45}
+                      className="ml-2"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
-            <TextArea
-              onChange={(e) => {
-                setInputMsg(e.target.value);
-              }}
-              autoSize={{ minRows: 2, maxRows: 2 }}
-              variant="borderless"
-              value={inputMsg}
-              className="w-full h-10"
-            />
-            <div className="w-full flex justify-end items-center">
-              <Button
-                type="primary"
-                onClick={sendMsg}
-                disabled={!inputMsg.trim()}
-              >
-                发送
-              </Button>
+            <div className="w-full h-30 box-border p-2 bg-[#e9e9e9]">
+              <div className="w-full">
+                <div className="relative">
+                  <SmileOutlined
+                    className={`text-[24px] ${emojiOpen ? 'text-[#0099ff]' : ''} `}
+                    onClick={() => setEmojiOpen(!emojiOpen)}
+                  />
+                  {emojiOpen ? (
+                    <div className="absolute flexCenter bottom-9 w-50 h-50 bg-white rounded-md border border-solid border-[#e9e9e9] shadow-lg">
+                      <Row
+                        // gutter={8}
+                        className="w-45 h-45 overflow-scroll overflow-x-hidden"
+                      >
+                        {emojiArray.map((item) => {
+                          return (
+                            <Col span={4} key={item.id}>
+                              <div
+                                className="text-[20px] w-7 h-7 select-none flexCenter mb-2 rounded-md cursor-pointer hover:bg-[#eeeded]"
+                                onClick={() =>
+                                  setInputMsg(inputMsg + item.emoji)
+                                }
+                              >
+                                {item.emoji}
+                              </div>
+                            </Col>
+                          );
+                        })}
+                      </Row>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                </div>
+                <div></div>
+              </div>
+              <TextArea
+                onChange={(e) => {
+                  setInputMsg(e.target.value);
+                }}
+                autoSize={{ minRows: 2, maxRows: 2 }}
+                variant="borderless"
+                value={inputMsg}
+                className="w-full h-10"
+              />
+              <div className="w-full flex justify-end items-center">
+                <Button
+                  type="primary"
+                  onClick={sendMsg}
+                  disabled={!inputMsg.trim()}
+                >
+                  发送
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="h-full flex-1">
+            <EmptyData title="请开始聊天吧！" />
+          </div>
+        )}
         <Drawer
           // title="Basic Drawer"
           placement="right"
           closable={false}
-          onClose={onClose}
+          onClose={() => setShowUserControls(false)}
           open={showUserControls}
           getContainer={false}
           width={300}
@@ -365,7 +416,7 @@ export const Msg = () => {
       </Modal>
       <Modal
         open={showDeleteMsg}
-        onOk={deleteMsg}
+        onOk={() => setShowDeleteMsg(false)}
         onCancel={() => setShowDeleteMsg(false)}
         width={350}
         // style={{ top: '45%' }}

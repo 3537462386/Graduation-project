@@ -74,7 +74,6 @@ const register = async (ctx, next) => {
 		}
 		return;
 	}
-
 	try {
 		let newUser = await User_col.create({
 			username: username,
@@ -104,7 +103,6 @@ const register = async (ctx, next) => {
 			msg: err
 		}
 	}
-
 }
 
 // 获取头像操作
@@ -196,7 +194,7 @@ const getUser = async (ctx, next) => {
 	}
 }
 
-// 查询用户
+// 删除用户
 const deleteFriend = async (ctx, next) => {
 	const { userId, friendId } = ctx.request.body;
 	// 查表
@@ -334,7 +332,13 @@ const getFriends = async (ctx, next) => {
 					_id: friend_data._id,
 					username: friend_data.username,
 					name: friend_data.name,
-					avatar: friend_data.avatar
+					avatar: friend_data.avatar,
+					info: {
+						sex: friend_data.info.sex,
+						age: friend_data.info.age,
+						birthday: friend_data.info.birthday,
+						sign: friend_data.info.sign
+					}
 				})
 			}
 			ctx.body = {

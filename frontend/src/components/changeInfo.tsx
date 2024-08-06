@@ -105,87 +105,89 @@ export const ChangeInfo = () => {
   }, []);
 
   return (
-    <div className="h-125 w-125 p-5 bg-white border border-solid border-[#e9e9e9] shadow-lg absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10">
-      <div className="flex items-center justify-between mb-4">
-        <span></span>
-        <p>编辑资料</p>
-        <Button
-          icon={<CloseOutlined />}
-          onClick={() => dispatch(setChangeInfoVisible())}
-        ></Button>
-      </div>
-      <div>
-        <div className="w-full flexCenter">
-          <Upload
-            name="avatar"
-            className="w-22 h-22"
-            showUploadList={false}
-            // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-            //   beforeUpload={beforeUpload}
-            onChange={handleChange}
-          >
-            <img
-              src={avatar}
-              alt="avatar"
-              className="w-20 h-20 rounded-[50%] overflow-hidden"
-            />
-          </Upload>
+    <div className="w-100vw h-screen backdrop-blur-sm z-2">
+      <div className="h-125 w-125 p-5 bg-white border border-solid border-[#e9e9e9] shadow-lg absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10">
+        <div className="flex items-center justify-between mb-4">
+          <span></span>
+          <p>编辑资料</p>
+          <Button
+            icon={<CloseOutlined />}
+            onClick={() => dispatch(setChangeInfoVisible())}
+          ></Button>
         </div>
+        <div>
+          <div className="w-full flexCenter">
+            <Upload
+              name="avatar"
+              className="w-22 h-22"
+              showUploadList={false}
+              // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+              //   beforeUpload={beforeUpload}
+              onChange={handleChange}
+            >
+              <img
+                src={avatar}
+                alt="avatar"
+                className="w-20 h-20 rounded-[50%] overflow-hidden"
+              />
+            </Upload>
+          </div>
 
-        <Form
-          name="basic"
-          style={{ maxWidth: 600 }}
-          form={form}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-        >
-          <Form.Item<FieldType> name="name" label="昵称">
-            <Input
-              showCount
-              maxLength={36}
-              className="w-full"
-              placeholder="请输入你的昵称"
-              // defaultValue={userInfo.name}
-            />
-          </Form.Item>
+          <Form
+            name="basic"
+            style={{ maxWidth: 600 }}
+            form={form}
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
+          >
+            <Form.Item<FieldType> name="name" label="昵称">
+              <Input
+                showCount
+                maxLength={36}
+                className="w-full"
+                placeholder="请输入你的昵称"
+                // defaultValue={userInfo.name}
+              />
+            </Form.Item>
 
-          <Form.Item<FieldType> name="sign" label="个签">
-            <Input
-              className="w-full"
-              showCount
-              maxLength={80}
-              placeholder="请输入你的个性签名!"
-              // defaultValue={userInfo.info?.sign ?? ''}
-            />
-          </Form.Item>
+            <Form.Item<FieldType> name="sign" label="个签">
+              <Input
+                className="w-full"
+                showCount
+                maxLength={80}
+                placeholder="请输入你的个性签名!"
+                // defaultValue={userInfo.info?.sign ?? ''}
+              />
+            </Form.Item>
 
-          <Form.Item<FieldType> name="sex" label="性别">
-            <Select
-              className="w-full"
-              // defaultValue={userInfo.info?.sex ?? ''}
-              options={[
-                { value: '男', label: '男' },
-                { value: '女', label: '女' }
-              ]}
-            />
-          </Form.Item>
+            <Form.Item<FieldType> name="sex" label="性别">
+              <Select
+                className="w-full"
+                // defaultValue={userInfo.info?.sex ?? ''}
+                options={[
+                  { value: '男', label: '男' },
+                  { value: '女', label: '女' }
+                ]}
+              />
+            </Form.Item>
 
-          <Form.Item<FieldType> name="birthday" label="生日">
-            <DatePicker
-              className="w-full"
-              // defaultValue={userInfo.info?.birthday ?? ''}
-            />
-          </Form.Item>
-          <Form.Item className="w-full flex justify-end">
-            <Button type="primary" htmlType="submit" className="mr-4">
-              保存
-            </Button>
-            <Button onClick={() => dispatch(setChangeInfoVisible())}>
-              取消
-            </Button>
-          </Form.Item>
-        </Form>
+            <Form.Item<FieldType> name="birthday" label="生日">
+              <DatePicker
+                className="w-full"
+                // defaultValue={userInfo.info?.birthday ?? ''}
+              />
+            </Form.Item>
+            <Form.Item className="w-full flex justify-end">
+              <Button type="primary" htmlType="submit" className="mr-4">
+                保存
+              </Button>
+              <Button onClick={() => dispatch(setChangeInfoVisible())}>
+                取消
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
       </div>
     </div>
   );

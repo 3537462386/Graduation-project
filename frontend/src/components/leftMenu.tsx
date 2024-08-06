@@ -3,7 +3,7 @@
  * @Author: L·W
  * @Date: 2024-04-09 10:54:02
  * @LastEditors: L·W
- * @LastEditTime: 2024-05-11 15:22:26
+ * @LastEditTime: 2024-05-22 16:16:36
  * @Description: Description
  */
 // import { CommonState } from '@/store/modules/common';
@@ -89,12 +89,13 @@ export const LeftMenu = () => {
           url={'/home/contacts'}
           icon={'/static/leftMenu/contacts.svg'}
         />
+        <MenuItem url={'/home/texts'} icon={'/static/leftMenu/texts.svg'} />
       </div>
       <div className="w-full flex flex-col items-center justify-center">
         <Dropdown
           menu={{ items, onClick }}
           trigger={['click']}
-          placement="topRight"
+          placement="topLeft"
         >
           <MenuOutlined className="text-[25px] hover:text-blue-500" />
         </Dropdown>
